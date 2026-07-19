@@ -1,0 +1,425 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>旅遊規劃師 盧端祥 LuLu | 專屬您的旅遊顧問</title>
+    <style>
+        /* 全局樣式 */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        body {
+            font-family: 'PingFang TC', 'Microsoft JhengHei', sans-serif;
+            color: #333333;
+            background-color: #faf8f5;
+            line-height: 1.7;
+        }
+        img {
+            max-width: 100%;
+            height: auto;
+        }
+        a {
+            text-decoration: none;
+            transition: all 0.3s ease;
+        }
+
+        /* 導覽列 */
+        header {
+            background-color: #ffffff;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            position: fixed;
+            width: 100%;
+            top: 0;
+            z-index: 1000;
+        }
+        .nav-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 15px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .logo {
+            font-size: 20px;
+            font-weight: bold;
+            color: #1a365d;
+        }
+        .logo span {
+            color: #dd6b20;
+        }
+        .nav-links {
+            display: flex;
+            list-style: none;
+        }
+        .nav-links li {
+            margin-left: 25px;
+        }
+        .nav-links a {
+            color: #4a5568;
+            font-weight: 500;
+        }
+        .nav-links a:hover {
+            color: #dd6b20;
+        }
+
+        /* Hero 主視覺 */
+        .hero {
+            background: linear-gradient(rgba(26, 54, 93, 0.75), rgba(26, 54, 93, 0.75)), url('https://images.unsplash.com/photo-1469854523086-cc02fe5d8800?auto=format&fit=crop&w=1600&q=80') no-repeat center center/cover;
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            text-align: center;
+            color: #ffffff;
+            padding: 0 20px;
+            padding-top: 70px;
+        }
+        .hero-content {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        .hero h1 {
+            font-size: 42px;
+            margin-bottom: 20px;
+            font-weight: 700;
+            letter-spacing: 1px;
+            line-height: 1.3;
+        }
+        .hero p {
+            font-size: 18px;
+            margin-bottom: 35px;
+            opacity: 0.95;
+        }
+        .btn {
+            display: inline-block;
+            padding: 14px 35px;
+            border-radius: 50px;
+            font-size: 18px;
+            font-weight: bold;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        }
+        .btn-line {
+            background-color: #06c755;
+            color: white;
+        }
+        .btn-line:hover {
+            background-color: #05b04b;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(6, 199, 85, 0.4);
+        }
+
+        /* 區塊通用樣式 */
+        section {
+            padding: 90px 20px;
+        }
+        .section-title {
+            text-align: center;
+            font-size: 32px;
+            color: #1a365d;
+            margin-bottom: 50px;
+            position: relative;
+            font-weight: 700;
+        }
+        .section-title::after {
+            content: '';
+            display: block;
+            width: 60px;
+            height: 4px;
+            background-color: #dd6b20;
+            margin: 15px auto 0;
+            border-radius: 2px;
+        }
+        .container {
+            max-width: 1100px;
+            margin: 0 auto;
+        }
+
+        /* 核心服務 */
+        .services {
+            background-color: #ffffff;
+        }
+        .grid-3 {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 30px;
+        }
+        .service-card {
+            background: #faf8f5;
+            padding: 40px 30px;
+            border-radius: 12px;
+            text-align: center;
+            border-top: 5px solid #1a365d;
+            transition: all 0.3s ease;
+        }
+        .service-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.05);
+            border-top-color: #dd6b20;
+        }
+        .service-icon {
+            font-size: 40px;
+            margin-bottom: 20px;
+            display: inline-block;
+        }
+        .service-card h3 {
+            font-size: 22px;
+            color: #1a365d;
+            margin-bottom: 15px;
+        }
+        .service-card p {
+            color: #626262;
+            font-size: 15px;
+        }
+
+        /* 關於我 */
+        .about {
+            background-color: #f0f4f8;
+        }
+        .about-flex {
+            display: flex;
+            align-items: center;
+            gap: 50px;
+        }
+        .about-img {
+            flex: 1;
+            text-align: center;
+        }
+        .about-img img {
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            max-width: 380px;
+            width: 100%;
+        }
+        .about-text {
+            flex: 1.2;
+        }
+        .about-text h3 {
+            font-size: 26px;
+            color: #1a365d;
+            margin-bottom: 5px;
+        }
+        .about-text .subtitle {
+            font-size: 16px;
+            color: #dd6b20;
+            font-weight: 600;
+            margin-bottom: 20px;
+        }
+        .about-text p {
+            color: #4a5568;
+            margin-bottom: 15px;
+            font-size: 16px;
+        }
+
+        /* 核心優勢 */
+        .advantages {
+            background-color: #ffffff;
+        }
+        .adv-list {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        .adv-item {
+            display: flex;
+            align-items: flex-start;
+            margin-bottom: 30px;
+            background: #f7fafc;
+            padding: 25px;
+            border-radius: 8px;
+            border-left: 5px solid #dd6b20;
+        }
+        .adv-num {
+            font-size: 24px;
+            font-weight: bold;
+            color: #dd6b20;
+            margin-right: 20px;
+            line-height: 1;
+        }
+        .adv-content h4 {
+            font-size: 18px;
+            color: #1a365d;
+            margin-bottom: 8px;
+            font-weight: 700;
+        }
+        .adv-content p {
+            color: #4a5568;
+            font-size: 15px;
+        }
+
+        /* CTA 行動呼籲 */
+        .cta-section {
+            background: linear-gradient(rgba(26, 54, 93, 0.9), rgba(26, 54, 93, 0.9)), url('https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=1600&q=80') no-repeat center center/cover;
+            color: white;
+            text-align: center;
+            padding: 100px 20px;
+        }
+        .cta-section h2 {
+            font-size: 36px;
+            margin-bottom: 20px;
+        }
+        .cta-section p {
+            font-size: 18px;
+            margin-bottom: 35px;
+            opacity: 0.9;
+        }
+        .contact-info {
+            margin-top: 40px;
+            font-size: 16px;
+            border-top: 1px solid rgba(255,255,255,0.2);
+            padding-top: 30px;
+            display: inline-block;
+        }
+        .contact-info p {
+            margin-bottom: 8px;
+            opacity: 1;
+        }
+
+        /* 頁尾 */
+        footer {
+            background-color: #1a202c;
+            color: #a0aec0;
+            text-align: center;
+            padding: 20px;
+            font-size: 14px;
+        }
+
+        /* RWD 響應式 */
+        @media (max-width: 900px) {
+            .grid-3 {
+                grid-template-columns: 1fr;
+            }
+            .about-flex {
+                flex-direction: column;
+                text-align: center;
+            }
+            .about-img img {
+                max-width: 300px;
+            }
+            .hero h1 {
+                font-size: 32px;
+            }
+            .hero p {
+                font-size: 16px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- 導覽列 -->
+    <header>
+        <div class="nav-container">
+            <div class="logo">LuLu <span>旅遊規劃</span></div>
+            <ul class="nav-links">
+                <li><a href="#services">服務項目</a></li>
+                <li><a href="#about">關於我</a></li>
+                <li><a href="#advantages">核心優勢</a></li>
+                <li><a href="#contact">聯絡諮詢</a></li>
+            </ul>
+        </div>
+    </header>
+
+    <!-- Hero 主視覺 -->
+    <section class="hero">
+        <div class="hero-content">
+            <h1>預約下一趟完美出發！<br>專屬您的全方位旅遊規劃專家</h1>
+            <p>厭倦了繁瑣的行程做功課？從熱門跟團、客製化包車到超值清艙特惠，交給專業規劃師 LuLu，讓旅行變得輕鬆又簡單！</p>
+            <a href="https://line.me/ti/p/~0907585858" class="btn btn-line" target="_blank">👉 點我加入 LINE 領取最新旅遊清艙特惠</a>
+        </div>
+    </section>
+
+    <!-- 核心服務 -->
+    <section id="services" class="services">
+        <div class="container">
+            <h2 class="section-title">核心服務項目</h2>
+            <div class="grid-3">
+                <div class="service-card">
+                    <div class="service-icon">🌍</div>
+                    <h3>精選團體旅遊</h3>
+                    <p>嚴選優質行程，帶您深度體驗世界各地的美好風情，吃喝玩樂通通幫您把關。</p>
+                </div>
+                <div class="service-card">
+                    <div class="service-icon">🔥</div>
+                    <h3>超值清艙特惠</h3>
+                    <p>第一手掌握限時限量「早鳥清艙福利」，用最超值的預算玩遍全球，小資首選。</p>
+                </div>
+                <div class="service-card">
+                    <div class="service-icon">🗺️</div>
+                    <h3>客製化行程規劃</h3>
+                    <p>無論是企業員工旅遊、家族聚會還是好友畢旅，皆可依預算與喜好量身打造專屬行程。</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 關於我 -->
+    <section id="about" class="about">
+        <div class="container">
+            <div class="about-flex">
+                <div class="about-img">
+                    <!-- 預留您的照片，這裡先用高質感旅行意境圖代替 -->
+                    <img src="https://images.unsplash.com/photo-1488646953014-85cb44e25828?auto=format&fit=crop&w=600&q=80" alt="旅遊規劃師 LuLu">
+                </div>
+                <div class="about-text">
+                    <h3>旅遊規劃師 ｜ 盧端祥 (LuLu)</h3>
+                    <p class="subtitle">我在「找到了旅行社」為您服務</p>
+                    <p>嗨！我是 LuLu。旅行不只是轉換地點，更是充實靈魂、創造珍貴回憶的過程。然而，完美的旅行背後往往需要耗費大量的時間比價、排行程與確認細節。</p>
+                    <p>我的使命就是幫每位渴望探索世界的旅客，省去這些燒腦的繁瑣步驟。無論您想尋找極致性價比的清艙好康，還是尊榮無憂的客製化旅程，交給我，您只需負責收拾行李、帶著期待的心情輕鬆出發！</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 核心優勢 -->
+    <section id="advantages" class="advantages">
+        <div class="container">
+            <h2 class="section-title">為什麼選擇 LuLu？</h2>
+            <div class="adv-list">
+                <div class="adv-item">
+                    <div class="adv-num">01</div>
+                    <div class="adv-content">
+                        <h4>專業合法旅行社後盾</h4>
+                        <p>服務於專業資深的「找到了旅行社」，所有行程安全、合法、全面有保障，讓您出遊最安心。</p>
+                    </div>
+                </div>
+                <div class="adv-item">
+                    <div class="adv-num">02</div>
+                    <div class="adv-content">
+                        <h4>第一手好康特惠情報</h4>
+                        <p>即時鎖定市場上最新、最殺的清艙與早鳥優惠，第一時間分享到社群，幫您的旅費精打細算。</p>
+                    </div>
+                </div>
+                <div class="adv-item">
+                    <div class="adv-num">03</div>
+                    <div class="adv-content">
+                        <h4>一對一貼心諮詢服務</h4>
+                        <p>從出發前的簽證辦理、行程細節確認到旅途中的支援，提供最即時的專人回覆，不再擔心變孤兒。</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- CTA 行動呼籲 -->
+    <section id="contact" class="cta-section">
+        <div class="container">
+            <h2>別再猶豫了！下一趟精彩旅程，現在就開始</h2>
+            <p>立即加入我的 LINE 官方帳號，或直接來電，讓我成為您的專屬旅遊顧問。</p>
+            <a href="https://line.me/ti/p/~0907585858" class="btn btn-line" target="_blank">💚 立即加 LINE 諮詢 / 掌握最新出團情報</a>
+            <br>
+            <div class="contact-info">
+                <p>📞 旅程熱線：0907-585-858</p>
+                <p>🆔 LINE 搜尋：0907585858</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- 頁尾 -->
+    <footer>
+        <p>&copy; 2026 旅遊規劃師 盧端祥 (LuLu) | 找到了旅行社. All Rights Reserved.</p>
+    </footer>
+
+</body>
+</html>
