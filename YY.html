@@ -1,0 +1,526 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>無盡挑戰：寵物連連看百分百有聲版</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            user-select: none;
+            -webkit-user-select: none;
+        }
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: #2c3e50;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            color: white;
+            overflow: hidden;
+        }
+        
+        /* 歡迎首頁彈窗 */
+        #start-screen {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(44, 62, 80, 0.95);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 100;
+        }
+        #start-screen h1 {
+            font-size: 28px;
+            margin-bottom: 20px;
+            color: #f1c40f;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.5);
+        }
+
+        /* 頂部 UI 面板 */
+        #ui-panel {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            width: 95%;
+            max-width: 450px;
+            margin-bottom: 10px;
+            padding: 12px;
+            background: rgba(0,0,0,0.5);
+            border-radius: 10px;
+        }
+        .ui-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .info-text { font-size: 16px; font-weight: bold; }
+        .highlight { color: #f1c40f; font-size: 18px; }
+        
+        /* 時間條 */
+        #progress-bar-container {
+            width: 100%;
+            height: 12px;
+            background: #7f8c8d;
+            border-radius: 6px;
+            overflow: hidden;
+        }
+        #progress-bar {
+            width: 100%;
+            height: 100%;
+            background: #2ecc71;
+            transition: width 0.2s linear, background-color 0.5s;
+        }
+
+        .btn {
+            background: #e74c3c;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 5px;
+            font-size: 14px;
+            font-weight: bold;
+            cursor: pointer;
+            box-shadow: 0 4px 0 #c0392b;
+        }
+        .btn:active {
+            background: #c0392b;
+            transform: translateY(2px);
+            box-shadow: 0 2px 0 #962d22;
+        }
+        .btn-large {
+            font-size: 20px;
+            padding: 12px 30px;
+        }
+        
+        /* 遊戲舞台 */
+        #game-container {
+            position: relative;
+            background: #34495e;
+            border: 4px solid #2c3e50;
+            border-radius: 8px;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.3);
+        }
+        #game-board {
+            display: grid;
+            padding: 5px;
+        }
+        .cell {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #ecf0f1;
+            border-radius: 4px;
+            margin: 2px;
+            font-size: 22px;
+            font-weight: bold;
+            box-shadow: inset 0 -3px 0 #bdc3c7;
+            transition: transform 0.1s;
+        }
+        .cell:active { transform: scale(0.9); }
+        .cell.selected {
+            background: #f1c40f;
+            box-shadow: inset 0 -3px 0 #f39c12;
+        }
+        .cell.empty {
+            visibility: hidden;
+            pointer-events: none;
+        }
+        
+        #line-canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 10;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- 開始首頁（啟用 Web Audio 核心） -->
+    <div id="start-screen">
+        <h1>🎵 經典寵物連連看 🐾</h1>
+        <button class="btn btn-large" onclick="startGameFirstTime()">進入遊戲</button>
+    </div>
+
+    <div id="ui-panel">
+        <div class="ui-row">
+            <div class="info-text">關卡: <span id="level" class="highlight">1</span></div>
+            <div class="info-text">分數: <span id="score" class="highlight">0</span></div>
+            <button class="btn" onclick="restartGame()">重新開始</button>
+        </div>
+        <div id="progress-bar-container">
+            <div id="progress-bar"></div>
+        </div>
+    </div>
+
+    <div id="game-container">
+        <div id="game-board"></div>
+        <canvas id="line-canvas"></canvas>
+    </div>
+
+<script>
+const ROWS = 8;        
+const COLS = 8;        
+
+const ALL_POKEMONS = ['🐱', '🐶', '🦊', '🦁', '🐸', '🐵', '🐷', '🐼', '🐨', '🐰', '🐯', '🐻', '🦖', '🐙', '🦄', '🐝']; 
+
+let board = [];
+let selectedCell = null;
+let score = 0;
+let level = 1;
+
+let timeLeft = 100; 
+let gameTimer = null;
+const TIME_MAX = 100;
+let baseTimeSpeed = 1.5; 
+
+// =================【 🔥 Web Audio API 原生音效引擎 🔥 】=================
+let audioCtx = null;
+let bgmInterval = null;
+
+function initAudio() {
+    if (!audioCtx) {
+        audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    }
+    if (audioCtx.state === 'suspended') {
+        audioCtx.resume();
+    }
+}
+
+// 播放單個音符
+function playTone(freq, type, duration, vol = 0.1, delay = 0) {
+    if (!audioCtx) return;
+    setTimeout(() => {
+        try {
+            let osc = audioCtx.createOscillator();
+            let gain = audioCtx.createGain();
+            osc.type = type;
+            osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+            
+            gain.gain.setValueAtTime(vol, audioCtx.currentTime);
+            // 音量漸弱，聽起來比較自然
+            gain.gain.exponentialRampToValueAtTime(0.00001, audioCtx.currentTime + duration);
+            
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+            osc.start();
+            osc.stop(audioCtx.currentTime + duration);
+        } catch(e) { console.log(e); }
+    }, delay * 1000);
+}
+
+// 循環播放 BGM（經典 8-Bit 復古和弦電子樂）
+function startBGM() {
+    if (bgmInterval) clearInterval(bgmInterval);
+    
+    // 簡單的 4 拍旋律循環
+    const notes = [261.63, 329.63, 392.00, 329.63, 293.66, 349.23, 440.00, 349.23]; // C-E-G-E, D-F-A-F
+    let step = 0;
+    
+    bgmInterval = setInterval(() => {
+        // 使用極低的音量當背景伴奏，波形用三角波(triangle)比較溫和
+        playTone(notes[step % notes.length], 'triangle', 0.4, 0.03);
+        step++;
+    }, 400); // 拍子速度
+}
+
+function stopBGM() {
+    if (bgmInterval) clearInterval(bgmInterval);
+}
+
+// 各種情境音效
+function playSoundClick() { playTone(600, 'sine', 0.05, 0.1); }
+function playSoundMatch() { 
+    playTone(523.25, 'square', 0.1, 0.1); // 快速雙音階
+    playTone(659.25, 'square', 0.15, 0.1, 0.06); 
+}
+function playSoundWin() {
+    let now = 0; // 勝利上升音階
+    [523, 587, 659, 698, 784, 880, 987, 1046].forEach((f, i) => {
+        playTone(f, 'sine', 0.15, 0.08, i * 0.08);
+    });
+}
+function playSoundGameOver() {
+    playTone(200, 'sawtooth', 0.3, 0.15);
+    playTone(150, 'sawtooth', 0.4, 0.15, 0.15);
+}
+
+// ======================================================================
+
+function startGameFirstTime() {
+    initAudio(); // 玩家點擊時，瞬間解鎖手機音訊密碼
+    document.getElementById('start-screen').style.display = 'none';
+    startBGM();
+    restartGame();
+}
+
+function restartGame() {
+    score = 0;
+    level = 1;
+    initLevel();
+}
+
+function initLevel() {
+    selectedCell = null;
+    timeLeft = TIME_MAX;
+    document.getElementById('score').innerText = score;
+    document.getElementById('level').innerText = level;
+    
+    const pokemonPoolSize = Math.min(4 + Math.floor(level / 2), ALL_POKEMONS.length);
+    const currentPokemons = ALL_POKEMONS.slice(0, pokemonPoolSize);
+    
+    const totalPlayableCells = (ROWS - 2) * (COLS - 2);
+    
+    let pool = [];
+    const pairsNeeded = totalPlayableCells / 2;
+    for (let i = 0; i < pairsNeeded; i++) {
+        const randomIcon = currentPokemons[Math.floor(Math.random() * currentPokemons.length)];
+        pool.push(randomIcon, randomIcon);
+    }
+    
+    for (let i = pool.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [pool[i], pool[j]] = [pool[j], pool[i]];
+    }
+    
+    board = [];
+    let poolIndex = 0;
+    for (let r = 0; r < ROWS; r++) {
+        board[r] = [];
+        for (let c = 0; c < COLS; c++) {
+            if (r === 0 || r === ROWS - 1 || c === 0 || c === COLS - 1) {
+                board[r][c] = ''; 
+            } else {
+                board[r][c] = pool[poolIndex++];
+            }
+        }
+    }
+    
+    renderBoard();
+    resizeCanvas();
+    startTimer();
+}
+
+function startTimer() {
+    clearInterval(gameTimer);
+    const currentSpeed = baseTimeSpeed * (1 + (level - 1) * 0.1);
+    
+    gameTimer = setInterval(() => {
+        timeLeft -= currentSpeed * 0.2; 
+        if (timeLeft <= 0) {
+            timeLeft = 0;
+            clearInterval(gameTimer);
+            stopBGM();
+            playSoundGameOver();
+            
+            alert(`時間到！Game Over 😭\n你最終達到了第 ${level} 關\n總得分：${score}`);
+            startBGM();
+            restartGame();
+        }
+        updateTimerUI();
+    }, 200);
+}
+
+function updateTimerUI() {
+    const bar = document.getElementById('progress-bar');
+    bar.style.width = `${timeLeft}%`;
+    if (timeLeft < 30) {
+        bar.style.backgroundColor = '#e74c3c';
+    } else if (timeLeft < 60) {
+        bar.style.backgroundColor = '#f1c40f';
+    } else {
+        bar.style.backgroundColor = '#2ecc71';
+    }
+}
+
+function renderBoard() {
+    const boardEl = document.getElementById('game-board');
+    boardEl.innerHTML = '';
+    
+    const screenWidth = window.innerWidth;
+    const boardWidth = Math.min(screenWidth * 0.95, 450); 
+    const cellSize = Math.floor(boardWidth / COLS) - 4; 
+    
+    boardEl.style.gridTemplateColumns = `repeat(${COLS}, ${cellSize + 4}px)`;
+    
+    for (let r = 0; r < ROWS; r++) {
+        for (let c = 0; c < COLS; c++) {
+            const cellEl = document.createElement('div');
+            cellEl.style.width = `${cellSize}px`;
+            cellEl.style.height = `${cellSize}px`;
+            cellEl.style.lineHeight = `${cellSize}px`;
+            
+            if (board[r][c] === '') {
+                cellEl.className = 'cell empty';
+            } else {
+                cellEl.className = 'cell';
+                cellEl.innerText = board[r][c];
+                cellEl.dataset.r = r;
+                cellEl.dataset.c = c;
+                cellEl.addEventListener('click', onCellClick);
+            }
+            boardEl.appendChild(cellEl);
+        }
+    }
+    
+    const container = document.getElementById('game-container');
+    container.style.width = boardEl.offsetWidth + 'px';
+    container.style.height = boardEl.offsetHeight + 'px';
+}
+
+function onCellClick(e) {
+    initAudio(); // 確保每次觸控都與音訊保持連線
+    playSoundClick();
+    
+    const cellEl = e.currentTarget;
+    const r = parseInt(cellEl.dataset.r);
+    const c = parseInt(cellEl.dataset.c);
+    
+    if (!selectedCell) {
+        selectedCell = { r, c, el: cellEl };
+        cellEl.classList.add('selected');
+    } else {
+        if (selectedCell.r === r && selectedCell.c === c) {
+            cellEl.classList.remove('selected');
+            selectedCell = null;
+            return;
+        }
+        
+        if (board[r][c] === board[selectedCell.r][selectedCell.c]) {
+            const path = findPath(selectedCell.r, selectedCell.c, r, c);
+            if (path) {
+                drawLinkLine(path);
+                board[selectedCell.r][selectedCell.c] = '';
+                board[r][c] = '';
+                
+                playSoundMatch();
+                
+                score += 10 * level; 
+                timeLeft = Math.min(TIME_MAX, timeLeft + 8); 
+                
+                document.getElementById('score').innerText = score;
+                
+                const oldEl = selectedCell.el;
+                selectedCell = null;
+                
+                setTimeout(() => {
+                    oldEl.className = 'cell empty';
+                    cellEl.className = 'cell empty';
+                    clearCanvas();
+                    checkWin();
+                }, 250);
+                return;
+            }
+        }
+        
+        selectedCell.el.classList.remove('selected');
+        selectedCell = { r, c, el: cellEl };
+        cellEl.classList.add('selected');
+    }
+}
+
+function findPath(r1, c1, r2, c2) {
+    let queue = [{ r: r1, c: c1, dir: -1, turns: 0, path: [{ r: r1, c: c1 }] }];
+    const dr = [-1, 0, 1, 0];
+    const dc = [0, 1, 0, -1];
+    
+    while (queue.length > 0) {
+        let curr = queue.shift();
+        if (curr.r === r2 && curr.c === c2) return curr.path;
+        
+        for (let i = 0; i < 4; i++) {
+            let nr = curr.r + dr[i];
+            let nc = curr.c + dc[i];
+            if (nr < 0 || nr >= ROWS || nc < 0 || nc >= COLS) continue;
+            
+            let nextTurns = curr.turns;
+            if (curr.dir !== -1 && curr.dir !== i) nextTurns++;
+            if (nextTurns > 2) continue;
+            
+            if (board[nr][nc] === '' || (nr === r2 && nc === c2)) {
+                queue.push({
+                    r: nr, c: nc,
+                    dir: i,
+                    turns: nextTurns,
+                    path: [...curr.path, { r: nr, c: nc }]
+                });
+            }
+        }
+    }
+    return null;
+}
+
+function resizeCanvas() {
+    const canvas = document.getElementById('line-canvas');
+    const container = document.getElementById('game-container');
+    if(container && canvas) {
+        canvas.width = container.offsetWidth;
+        canvas.height = container.offsetHeight;
+    }
+}
+
+function drawLinkLine(path) {
+    const canvas = document.getElementById('line-canvas');
+    const ctx = canvas.getContext('2d');
+    const cells = document.getElementsByClassName('cell');
+    const firstCell = cells[0];
+    const w = firstCell.offsetWidth + 4; 
+    const h = firstCell.offsetHeight + 4;
+    
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    ctx.beginPath();
+    ctx.strokeStyle = '#e67e22';
+    ctx.lineWidth = 5;
+    ctx.lineCap = 'round';
+    ctx.lineJoin = 'round';
+    
+    path.forEach((point, index) => {
+        const x = point.c * w + w / 2;
+        const y = point.r * h + h / 2;
+        if (index === 0) ctx.moveTo(x, y);
+        else ctx.lineTo(x, y);
+    });
+    ctx.stroke();
+}
+
+function clearCanvas() {
+    const canvas = document.getElementById('line-canvas');
+    const ctx = canvas.getContext('2d');
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+}
+
+function checkWin() {
+    for (let r = 1; r < ROWS - 1; r++) {
+        for (let c = 1; c < COLS - 1; c++) {
+            if (board[r][c] !== '') return;
+        }
+    }
+    
+    clearInterval(gameTimer);
+    stopBGM();
+    playSoundWin();
+    
+    level++;
+    alert(`恭喜通過第 ${level - 1} 關！🎉 準備迎戰第 ${level} 關！`);
+    startBGM();
+    initLevel();
+}
+
+window.onload = () => {
+    window.addEventListener('resize', () => {
+        renderBoard();
+        resizeCanvas();
+    });
+};
+</script>
+</body>
+</html>
