@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>霓虹極速避障 Neon Avoid</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            user-select: none;
+        }
+        body {
+            background-color: #0d0e15;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            color: #ffffff;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            overflow: hidden;
+        }
+        .container {
+            text-align: center;
+            max-width: 500px;
+            width: 100%;
+            padding: 10px;
+        }
+        h1 {
+            font-size: 24px;
+            margin-bottom: 10px;
+            text-shadow: 0 0 10px #00f0ff, 0 0 20px #00f0ff;
+            color: #00f0ff;
+            letter-spacing: 2px;
+        }
+        .dashboard {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            padding: 12px;
+            margin-bottom: 15px;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            font-size: 13px;
+        }
+        .control-group {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+        }
+        .control-group label {
+            margin-bottom: 4px;
+            color: #aaa;
+        }
+        .control-group input[type="range"] {
+            width: 100%;
+            accent-color: #ff007f;
+            cursor: pointer;
+        }
+        .stats {
+            grid-column: span 2;
+            display: flex;
+            justify-content: space-between;
+            background: rgba(0, 0, 0, 0.3);
+            padding: 6px 12px;
+            border-radius: 4px;
+            border-left: 3px solid #ff007f;
+            font-weight: bold;
+        }
+        .score-val {
+            color: #ff007f;
+            text-shadow: 0 0 5px #ff007f;
+        }
+        .high-val {
+            color: #ffaa00;
+            text-shadow: 0 0 5px #ffaa00;
+        }
+        #gameCanvas {
+            background: #141521;
+            border: 2px solid #00f0ff;
+            box-shadow: 0 0 15px rgba(0, 240, 255, 0.3);
+            border-radius: 6px;
+            cursor: none;
+            display: block;
+            margin: 0 auto;
+        }
+        .instructions {
+            margin-top: 12px;
+            font-size: 12px;
+            color: #666;
+            line-height: 1.4;
+        }
+        /* 彈出視窗（遊戲結束） */
+        .overlay {
+            display: none;
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(13, 14, 21, 0.85);
+            backdrop-filter: blur(4px);
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 10;
+        }
+        .modal {
+            background: #1a1b29;
+            border: 2px solid #ff007f;
+            box-shadow: 0 0 25px rgba(255, 0, 127, 0.5);
+            padding: 30px;
+            border-radius: 12px;
+            text-align: center;
+            max-width: 320px;
+            width: 90%;
+        }
+        .modal h2 {
+            color: #ff007f;
+            font-size: 28px;
+            margin-bottom: 15px;
+            text-shadow: 0 0 10px #ff007f;
+        }
+        .modal p {
+            font-size: 16px;
+            margin-bottom: 20px;
+            color: #ddd;
+        }
+        .btn {
+            background: linear-gradient(45deg, #ff007f, #7f00ff);
+            color: white;
+            border: none;
+            padding: 10px 24px;
+            font-size: 16px;
+            font-weight: bold;
+            border-radius: 20px;
+            cursor: pointer;
+            box-shadow: 0 0 10px rgba(255, 0, 127, 0.4);
+            transition: transform 0.1s, box-shadow 0.1s;
+        }
+        .btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 15px rgba(255, 0, 127, 0.6);
+        }
+        .btn:active {
+            transform: scale(0.95);
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1>NEON AVOID</h1>
+        
+        <div class="dashboard">
+            <div class="control-group">
+                <label for="speedSlider">遊戲速度: <span id="speedVal">1.0</span>x</label>
+                <input type="range" id="speedSlider" min="0.5" max="2.5" step="0.1" value="1.0">
+            </div>
+            <div class="control-group">
+                <label for="densitySlider">障礙密度: <span id="densityVal">1.0</span>x</label>
+                <input type="range" id="densitySlider" min="0.5" max="2.0" step="0.1" value="1.0">
+            </div>
+            <div class="stats">
+                <div>SCORE: <span id="score" class="score-val">0</span></div>
+                <div>HIGH: <span id="highScore" class="high-val">0</span></div>
+            </div>
+        </div>
+
+        <div style="position: relative;">
+            <canvas id="gameCanvas" width="400" height="450"></canvas>
+            
+            <!-- 遊戲結束 Overlay -->
+            <div id="gameOverOverlay" class="overlay">
+                <div class="modal">
+                    <h2>GAME OVER</h2>
+                    <p>最終得分：<span id="finalScore" class="score-val" style="font-size: 20px;">0</span></p>
+                    <button class="btn" id="restartBtn">再次挑戰</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="instructions">
+            操作方式：左右移動滑鼠，或使用鍵盤 <b>← / →</b> 或 <b>A / D</b> 鍵。<br>
+            提示：避開上方掉落的紅色方塊，生存時間越長分數越高！
+        </div>
+    </div>
+
+    <script>
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+        
+        // UI 元素
+        const speedSlider = document.getElementById('speedSlider');
+        const speedVal = document.getElementById('speedVal');
+        const densitySlider = document.getElementById('densitySlider');
+        const densityVal = document.getElementById('densityVal');
+        const scoreEl = document.getElementById('score');
+        const highScoreEl = document.getElementById('highScore');
+        const finalScoreEl = document.getElementById('finalScore');
+        const gameOverOverlay = document.getElementById('gameOverOverlay');
+        const restartBtn = document.getElementById('restartBtn');
+
+        // 遊戲變數
+        let score = 0;
+        let highScore = localStorage.getItem('neon_avoid_highscore') || 0;
+        highScoreEl.textContent = highScore;
+        
+        let gameActive = true;
+        let baseSpeed = 1.0;
+        let densityModifier = 1.0;
+        let keys = {};
+        
+        // 玩家設定
+        const player = {
+            x: canvas.width / 2 - 15,
+            y: canvas.height - 40,
+            width: 30,
+            height: 30,
+            speed: 7,
+            color: '#00f0ff'
+        };
+
+        // 障礙物陣列
+        let obstacles = [];
+        let spawnTimer = 0;
+
+        // 監聽器
+        speedSlider.addEventListener('input', (e) => {
+            baseSpeed = parseFloat(e.target.value);
+            speedVal.textContent = baseSpeed.toFixed(1);
+        });
+
+        densitySlider.addEventListener('input', (e) => {
+            densityModifier = parseFloat(e.target.value);
+            densityVal.textContent = densityModifier.toFixed(1);
+        });
+
+        restartBtn.addEventListener('click', resetGame);
+
+        // 鍵盤操作
+        window.addEventListener('keydown', (e) => { keys[e.key] = true; });
+        window.addEventListener('keyup', (e) => { keys[e.key] = false; });
+
+        // 滑鼠操作
+        canvas.addEventListener('mousemove', (e) => {
+            const rect = canvas.getBoundingClientRect();
+            const root = document.documentElement;
+            const mouseX = e.clientX - rect.left - root.scrollLeft;
+            
+            // 讓玩家中心跟隨滑鼠
+            player.x = mouseX - player.width / 2;
+            
+            // 邊界限制
+            if (player.x < 0) player.x = 0;
+            if (player.x > canvas.width - player.width) player.x = canvas.width - player.width;
+        });
+
+        // 產生障礙物
+        function spawnObstacle() {
+            const size = Math.random() * 25 + 15; // 15 到 40 之間的隨機大小
+            const x = Math.random() * (canvas.width - size);
+            const speed = (Math.random() * 3 + 2) * baseSpeed;
+            
+            obstacles.push({
+                x: x,
+                y: -size,
+                width: size,
+                height: size,
+                speed: speed,
+                color: '#ff007f'
+            });
+        }
+
+        // 碰撞檢測
+        function checkCollision(rect1, rect2) {
+            return rect1.x < rect2.x + rect2.width &&
+                   rect1.x + rect1.width > rect2.x &&
+                   rect1.y < rect2.y + rect2.height &&
+                   rect1.y + rect1.height > rect2.y;
+        }
+
+        // 重設遊戲
+        function resetGame() {
+            score = 0;
+            scoreEl.textContent = score;
+            obstacles = [];
+            spawnTimer = 0;
+            player.x = canvas.width / 2 - 15;
+            gameActive = true;
+            gameOverOverlay.style.display = 'none';
+            animate();
+        }
+
+        // 遊戲結束
+        function gameOver() {
+            gameActive = false;
+            finalScoreEl.textContent = Math.floor(score);
+            if (Math.floor(score) > highScore) {
+                highScore = Math.floor(score);
+                highScoreEl.textContent = highScore;
+                localStorage.setItem('neon_avoid_highscore', highScore);
+            }
+            gameOverOverlay.style.display = 'flex';
+        }
+
+        // 主迴圈
+        function animate() {
+            if (!gameActive) return;
+
+            // 清除畫布
+            ctx.fillStyle = '#141521';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            // 鍵盤移動更新
+            if (keys['ArrowLeft'] || keys['a'] || keys['A']) {
+                player.x -= player.speed;
+                if (player.x < 0) player.x = 0;
+            }
+            if (keys['ArrowRight'] || keys['d'] || keys['D']) {
+                player.x += player.speed;
+                if (player.x > canvas.width - player.width) player.x = canvas.width - player.width;
+            }
+
+            // 畫玩家 (帶霓虹發光感)
+            ctx.shadowBlur = 15;
+            ctx.shadowColor = player.color;
+            ctx.fillStyle = player.color;
+            ctx.fillRect(player.x, player.y, player.width, player.height);
+
+            // 更新與畫障礙物
+            spawnTimer += densityModifier;
+            if (spawnTimer >= 25) { // 依密度決定產生頻率
+                spawnObstacle();
+                spawnTimer = 0;
+            }
+
+            for (let i = obstacles.length - 1; i >= 0; i--) {
+                let obs = obstacles[i];
+                obs.y += obs.speed;
+
+                // 畫障礙物
+                ctx.shadowBlur = 10;
+                ctx.shadowColor = obs.color;
+                ctx.fillStyle = obs.color;
+                ctx.fillRect(obs.x, obs.y, obs.width, obs.height);
+
+                // 碰撞檢查
+                if (checkCollision(player, obs)) {
+                    gameOver();
+                    return;
+                }
+
+                // 移出螢幕刪除並加分
+                if (obs.y > canvas.height) {
+                    obstacles.splice(i, 1);
+                    score += 1;
+                    scoreEl.textContent = Math.floor(score);
+                }
+            }
+
+            // 重設 shadowBlur 避免影響其他繪製
+            ctx.shadowBlur = 0;
+
+            requestAnimationFrame(animate);
+        }
+
+        // 啟動遊戲
+        animate();
+    </script>
+</body>
+</html>
