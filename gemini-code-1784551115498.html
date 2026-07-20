@@ -3,396 +3,520 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Element TD 終極自由擺設雙倍速版</title>
+    <title>Element TD - 終極進化手機版</title>
+    <!-- 引入 Tailwind CSS 確保極致視覺美學 -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
     <style>
-        * { box-sizing: border-box; margin: 0; padding: 0; user-select: none; }
-        body { background: #222; color: #fff; font-family: sans-serif; padding: 10px; display: flex; justify-content: center; }
-        
-        #game-container { width: 420px; background: #111; border: 2px solid #444; border-radius: 8px; overflow: hidden; padding: 10px; }
-        
-        #header { display: flex; justify-content: space-between; padding: 5px 0 10px 0; font-size: 14px; border-bottom: 2px solid #444; }
-        .stat { font-weight: bold; }
-        .gold { color: #ffd700; }
-        .hp { color: #ff4d4d; }
-        .wave { color: #4da6ff; }
-
-        /* 地圖：允許任意點擊 */
-        #map { position: relative; width: 400px; height: 320px; background: #2a2a2a; border: 1px solid #333; margin: 10px 0; cursor: crosshair; }
-        .path { position: absolute; background: #555; pointer-events: none; }
-        
-        /* 雙倍速怪物 */
-        .enemy { position: absolute; width: 20px; height: 20px; border-radius: 50%; background: #fff; transform: translate(-10px, -10px); z-index: 10; font-size: 10px; text-align: center; line-height: 20px; font-weight: bold; color: #000; border: 1px solid #fff; pointer-events: none; }
-        .enemy.boss { width: 30px; height: 30px; line-height: 28px; transform: translate(-15px, -15px); border: 2px solid #fff; font-size: 13px; }
-        
-        /* 自由生成的塔 */
-        .tower { position: absolute; width: 34px; height: 34px; border-radius: 6px; transform: translate(-17px, -17px); cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: bold; color: #fff; z-index: 20; border: 2px solid #fff; }
-        
-        /* 塔階顏色 */
-        .tower.fire { background: #ff4d4d; }
-        .tower.water { background: #4da6ff; }
-        .tower.nature { background: #4dff4d; color: #000; }
-        .tower.steam { background: #e066ff; } 
-        .tower.wildfire { background: #ff7f24; } 
-        .tower.ice { background: #00ffff; color: #000; } 
-        /* 終極三階塔 */
-        .tower.ultwater { background: #00008b; border-color: #4da6ff; box-shadow: 0 0 8px #4da6ff; }
-        .tower.ultfire { background: #8b0000; border-color: #ff4d4d; box-shadow: 0 0 8px #ff4d4d; }
-        .tower.ultnature { background: #006400; border-color: #4dff4d; box-shadow: 0 0 8px #4dff4d; }
-
-        #controls { display: flex; flex-direction: column; gap: 8px; }
-        .btn { background: #28a745; color: #fff; border: none; padding: 12px; border-radius: 5px; font-size: 15px; font-weight: bold; cursor: pointer; text-align: center; }
-        .btn:active { filter: brightness(1.2); }
-        
-        .overlay-menu { display: none; position: fixed; bottom: 0; left: 50%; transform: translateX(-50%); width: 100%; max-width: 420px; background: rgba(0,0,0,0.95); padding: 15px; border-top-left-radius: 12px; border-top-right-radius: 12px; z-index: 100; box-shadow: 0 -5px 15px rgba(0,0,0,0.8); }
-        .menu-title { text-align: center; margin-bottom: 10px; font-size: 14px; color: #ccc; }
-        .menu-options { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
-        .menu-btn { padding: 12px 5px; font-size: 12px; border-radius: 6px; border: none; font-weight: bold; cursor: pointer; }
-        .menu-btn.fire { background: #ff4d4d; color: white; }
-        .menu-btn.water { background: #4da6ff; color: white; }
-        .menu-btn.nature { background: #4dff4d; color: black; }
-        .menu-btn.sell { background: #d9534f; color: white; grid-column: span 3; margin-top: 5px; }
-        .menu-close { grid-column: span 3; background: #555; color: white; margin-top: 2px; }
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #0f172a;
+            touch-action: manipulation;
+        }
+        /* 自定義捲軸 */
+        ::-webkit-scrollbar {
+            width: 4px;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #475569;
+            border-radius: 999px;
+        }
+        /* 戰場網格背景感 */
+        #map {
+            background-image: 
+                radial-gradient(circle, rgba(255,255,255,0.03) 1px, transparent 1px);
+            background-size: 20px 20px;
+        }
+        /* 核心修復：防禦塔與路徑的定位與色彩 */
+        .path {
+            position: absolute;
+            background-color: #334155; /* slate-700 */
+            z-index: 10;
+        }
+        .tower {
+            position: absolute;
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+            transform: translate(-16px, -16px);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 11px;
+            font-weight: 900;
+            z-index: 25;
+            border: 2px solid rgba(255, 255, 255, 0.4);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3), 0 2px 4px -1px rgba(0, 0, 0, 0.2);
+            transition: all 0.15s ease;
+        }
+        .tower:active {
+            transform: translate(-16px, -16px) scale(0.9);
+        }
+        /* 雙倍速怪物樣式 */
+        .enemy {
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            border-radius: 9999px;
+            transform: translate(-10px, -10px);
+            z-index: 30;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 10px;
+            font-weight: 800;
+            color: #0f172a;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+            transition: left 0.05s linear, top 0.05s linear;
+        }
+        .enemy.boss {
+            width: 30px;
+            height: 30px;
+            transform: translate(-15px, -15px);
+            font-size: 13px;
+        }
+        /* 子彈投射物樣式 */
+        .projectile {
+            position: absolute;
+            width: 8px;
+            height: 8px;
+            border-radius: 9999px;
+            transform: translate(-4px, -4px);
+            z-index: 40;
+            pointer-events: none;
+            box-shadow: 0 0 8px rgba(255, 255, 255, 0.8);
+        }
+        /* 射程指示圈 */
+        #range-indicator {
+            position: absolute;
+            border: 2px dashed rgba(255, 255, 255, 0.45);
+            border-radius: 9999px;
+            background-color: rgba(255, 255, 255, 0.05);
+            transform: translate(-50%, -50%);
+            pointer-events: none;
+            z-index: 15;
+            display: none;
+        }
     </style>
 </head>
-<body>
+<body class="text-slate-100 flex items-center justify-center min-h-screen p-2 md:p-6 overflow-x-hidden">
 
-<div id="game-container">
-    <div id="header">
-        <div class="stat wave">目前波次: <span id="ui-wave">0</span>/20</div>
-        <div class="stat gold">金幣: $<span id="ui-gold">150</span></div>
-        <div class="stat hp">生命: <span id="ui-hp">20</span></div>
+<div id="game-container" class="relative w-full max-w-[420px] bg-slate-900 border border-slate-700/50 rounded-2xl shadow-2xl overflow-hidden p-4 flex flex-col gap-3">
+    
+    <!-- 遊戲頂部資訊列 -->
+    <div id="header" class="flex justify-between items-center bg-slate-800/80 border border-slate-700/50 rounded-xl px-4 py-3 shadow-inner">
+        <div class="flex flex-col items-center">
+            <span class="text-xs text-slate-400 font-semibold uppercase tracking-wider">波次</span>
+            <span id="ui-wave" class="text-lg font-bold text-sky-400">0 / 20</span>
+        </div>
+        <div class="flex flex-col items-center">
+            <span class="text-xs text-slate-400 font-semibold uppercase tracking-wider">金幣</span>
+            <span id="ui-gold" class="text-lg font-bold text-amber-400">$200</span>
+        </div>
+        <div class="flex flex-col items-center">
+            <span class="text-xs text-slate-400 font-semibold uppercase tracking-wider">生命</span>
+            <span id="ui-hp" class="text-lg font-bold text-rose-500">20</span>
+        </div>
     </div>
 
-    <!-- 點擊地圖任意處即可蓋塔 -->
-    <div id="map" onclick="handleMapClick(event)"></div>
-
-    <div id="controls">
-        <button id="start-btn" class="btn" onclick="startNextWave()">開始下一波 (支援連按加速)</button>
-        <div style="font-size: 12px; color: #aaa; text-align: center; margin-top: 2px;">點擊地圖空地自由建造 ($50) | 點擊塔可連續升級</div>
+    <!-- 戰場地圖（支援觸控與點擊任意處建塔） -->
+    <div id="map" class="relative w-[388px] h-[320px] bg-slate-950 border border-slate-800 rounded-xl overflow-hidden shadow-inner mx-auto cursor-crosshair">
+        <!-- 射程範圍發光環 -->
+        <div id="range-indicator"></div>
+        <!-- 路線與防禦塔、怪物將動態生成於此 -->
     </div>
-</div>
 
-<!-- 建造選單 -->
-<div id="build-menu" class="overlay-menu">
-    <div class="menu-title">在此處建造基礎元素塔 (花費 $50)</div>
-    <div class="menu-options">
-        <button class="menu-btn fire" onclick="buildTower('fire')">火之塔<br>(剋草)</button>
-        <button class="menu-btn water" onclick="buildTower('water')">水之塔<br>(剋火)</button>
-        <button class="menu-btn nature" onclick="buildTower('nature')">草之塔<br>(剋水)</button>
-        <button class="menu-btn menu-close" onclick="closeMenus()">取消</button>
+    <!-- 控制按鈕區 -->
+    <div id="controls" class="flex flex-col gap-2">
+        <button id="start-btn" class="w-full bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-400 hover:to-teal-500 text-white font-bold py-3 px-4 rounded-xl shadow-lg transition-all duration-150 active:scale-95 flex justify-center items-center gap-2" onclick="startNextWave()">
+            <span>開始下一波 (支援連按疊加)</span>
+        </button>
+        <p class="text-center text-xs text-slate-400">
+            點擊地圖空地自由建造 ($50) <span class="mx-1">•</span> 點擊已建塔進行升級與改建
+        </p>
     </div>
-</div>
 
-<!-- 升級選單 -->
-<div id="upgrade-menu" class="overlay-menu">
-    <div id="upgrade-title" class="menu-title">防禦塔配置</div>
-    <div class="menu-options">
-        <button id="up-btn-1" class="menu-btn" onclick="upgradeTower('opt1')"></button>
-        <button id="up-btn-2" class="menu-btn" onclick="upgradeTower('opt2')"></button>
-        <button id="up-btn-3" class="menu-btn" onclick="upgradeTower('opt3')"></button>
-        <button class="menu-btn sell" onclick="sellTower()">拆除改建 (退還 $30)</button>
-        <button class="menu-btn menu-close" onclick="closeMenus()">返回</button>
+    <!-- 自定義遊戲內建通知系統（取代傳統 alert） -->
+    <div id="toast" class="absolute top-20 left-1/2 -translate-x-1/2 w-4/5 bg-slate-950/90 border border-red-500/30 text-rose-400 text-xs font-semibold py-2 px-4 rounded-lg shadow-xl text-center backdrop-blur-md opacity-0 pointer-events-none transition-all duration-300 transform translate-y-[-10px] z-50 flex items-center justify-center gap-2">
+        <span id="toast-text">金幣不足！</span>
+    </div>
+
+    <!-- 1. 基礎建造彈窗選單 -->
+    <div id="build-menu" class="absolute bottom-0 left-0 w-full bg-slate-950/95 border-t border-slate-800 p-4 rounded-t-2xl shadow-2xl z-40 transform translate-y-full transition-transform duration-300 ease-out hidden">
+        <h4 class="text-center text-sm font-bold text-slate-300 mb-3">在此處建造基礎元素塔 (花費 $50)</h4>
+        <div class="grid grid-cols-3 gap-3">
+            <button class="bg-gradient-to-br from-rose-500 to-red-600 hover:from-rose-400 text-white p-3 rounded-xl font-bold flex flex-col items-center justify-center transition-all" onclick="buildTower('fire')">
+                <span class="text-sm">火之塔</span>
+                <span class="text-[10px] opacity-90">(剋草/被水剋)</span>
+            </button>
+            <button class="bg-gradient-to-br from-sky-500 to-blue-600 hover:from-sky-400 text-white p-3 rounded-xl font-bold flex flex-col items-center justify-center transition-all" onclick="buildTower('water')">
+                <span class="text-sm">水之塔</span>
+                <span class="text-[10px] opacity-90">(剋火/被草剋)</span>
+            </button>
+            <button class="bg-gradient-to-br from-emerald-500 to-green-600 hover:from-emerald-400 text-slate-950 p-3 rounded-xl font-bold flex flex-col items-center justify-center transition-all" onclick="buildTower('nature')">
+                <span class="text-sm">草之塔</span>
+                <span class="text-[10px] opacity-90">(剋水/被火剋)</span>
+            </button>
+            <button class="col-span-3 bg-slate-800 hover:bg-slate-700 text-slate-300 p-2.5 rounded-xl font-semibold text-xs tracking-wider transition-all" onclick="closeMenus()">
+                取消建造
+            </button>
+        </div>
+    </div>
+
+    <!-- 2. 升級/改建彈窗選單 -->
+    <div id="upgrade-menu" class="absolute bottom-0 left-0 w-full bg-slate-950/95 border-t border-slate-800 p-4 rounded-t-2xl shadow-2xl z-40 transform translate-y-full transition-transform duration-300 ease-out hidden">
+        <h4 id="upgrade-title" class="text-center text-sm font-bold text-slate-300 mb-3">防禦塔配置與屬性融和</h4>
+        <div class="grid grid-cols-3 gap-3">
+            <button id="up-btn-1" class="hidden p-3 rounded-xl font-bold flex flex-col items-center justify-center transition-all"></button>
+            <button id="up-btn-2" class="hidden p-3 rounded-xl font-bold flex flex-col items-center justify-center transition-all"></button>
+            <button id="up-btn-3" class="hidden p-3 rounded-xl font-bold flex flex-col items-center justify-center transition-all"></button>
+            
+            <button class="col-span-3 bg-rose-600/90 hover:bg-rose-500 text-white p-3 rounded-xl font-bold text-xs shadow-lg transition-all" onclick="sellTower()">
+                拆除此塔 (退還 $30)
+            </button>
+            <button class="col-span-3 bg-slate-800 hover:bg-slate-700 text-slate-300 p-2.5 rounded-xl font-semibold text-xs transition-all" onclick="closeMenus()">
+                返回戰場
+            </button>
+        </div>
+    </div>
+
+    <!-- 終局結算與重新開始彈窗 -->
+    <div id="game-over-modal" class="absolute inset-0 bg-slate-950/95 backdrop-blur-md z-50 flex flex-col items-center justify-center p-6 text-center transform scale-95 opacity-0 pointer-events-none transition-all duration-300 hidden">
+        <h2 id="modal-title" class="text-3xl font-black mb-2 tracking-tight">遊戲結束</h2>
+        <p id="modal-desc" class="text-slate-400 text-sm mb-6 px-4">你已被元素大軍突破防線。</p>
+        <button class="bg-gradient-to-r from-sky-500 to-indigo-600 hover:from-sky-400 hover:to-indigo-500 text-white font-bold py-3 px-8 rounded-xl shadow-lg transition-all duration-150 active:scale-95" onclick="location.reload()">
+            重新開啟戰局
+        </button>
     </div>
 </div>
 
 <script>
-const game = { gold: 200, hp: 20, currentWave: 0, maxWave: 20, towerCost: 50, upgrade2Cost: 100, upgrade3Cost: 200 };
+const game = {
+    gold: 200,
+    hp: 20,
+    currentWave: 0,
+    maxWave: Infinity, // 關卡無盡循環
+    towerCost: 50,
+    upgrade2Cost: 100,
+    upgrade3Cost: 200,
+    isWaveActive: false
+};
 
+// 戰場路線定位（固定寬度 388x320）
 const pathPoints = [
-    {x: 20, y: 40}, {x: 340, y: 40}, {x: 340, y: 160},
-    {x: 60, y: 160}, {x: 60, y: 280}, {x: 380, y: 280}
+    {x: 20, y: 40}, 
+    {x: 330, y: 40}, 
+    {x: 330, y: 160},
+    {x: 50, y: 160}, 
+    {x: 50, y: 280}, 
+    {x: 370, y: 280}
 ];
 
-let enemies = []; let towers = []; let clickX = 0; let clickY = 0; let selectedTowerId = null; let gameInterval = null;
+let enemies = [];
+let towers = [];
+let projectiles = []; // 子彈投射物陣列
+let clickX = 0;
+let clickY = 0;
+let selectedTowerId = null;
+let gameInterval = null;
+let toastTimeout = null;
+
+// 自定義精美 Toast，不阻塞 JS 執行緒
+function triggerToast(message, type = 'danger') {
+    const toast = document.getElementById('toast');
+    const toastText = document.getElementById('toast-text');
+    
+    if(toastTimeout) clearTimeout(toastTimeout);
+    
+    toastText.innerText = message;
+    
+    if (type === 'danger') {
+        toast.className = toast.className.replace(/border-emerald-500\/30|text-emerald-400/, 'border-red-500/30 text-rose-400');
+    } else {
+        toast.className = toast.className.replace(/border-red-500\/30|text-rose-400/, 'border-emerald-500/30 text-emerald-400');
+    }
+    
+    toast.style.display = 'flex';
+    requestAnimationFrame(() => {
+        toast.style.opacity = '1';
+        toast.style.transform = 'translate(-50%, 0)';
+    });
+
+    toastTimeout = setTimeout(() => {
+        toast.style.opacity = '0';
+        toast.style.transform = 'translate(-50%, -10px)';
+        setTimeout(() => { toast.style.display = 'none'; }, 300);
+    }, 1800);
+}
+
+// 顯示終局 Modal (取代 blocking alert)
+function showEndGameModal(isVictory) {
+    const modal = document.getElementById('game-over-modal');
+    const title = document.getElementById('modal-title');
+    const desc = document.getElementById('modal-desc');
+    
+    if (isVictory) {
+        title.innerText = "⭐ 凱旋榮耀 ⭐";
+        title.className = "text-3xl font-black mb-2 tracking-tight text-amber-400";
+        desc.innerText = "恭喜你！成功防守了地獄級元素的輪番入侵，完美的元素組合大師！";
+    } else {
+        title.innerText = "💀 戰敗隕落 💀";
+        title.className = "text-3xl font-black mb-2 tracking-tight text-rose-500";
+        desc.innerText = "元素大軍攻破了最後防線，城堡已化為焦土。請重新調整元素搭配再次挑戰！";
+    }
+    
+    modal.classList.remove('hidden');
+    requestAnimationFrame(() => {
+        modal.classList.add('scale-100', 'opacity-100');
+        modal.style.pointerEvents = 'auto';
+    });
+    
+    clearInterval(gameInterval);
+}
+
+// 精準計算點到線段的最短距離，判定是否蓋在路上
+function getDistanceToSegment(px, py, x1, y1, x2, y2) {
+    const dx = x2 - x1;
+    const dy = y2 - y1;
+    if (dx === 0 && dy === 0) {
+        return Math.sqrt((px - x1)**2 + (py - y1)**2);
+    }
+    let t = ((px - x1) * dx + (py - y1) * dy) / (dx * dx + dy * dy);
+    t = Math.max(0, Math.min(1, t));
+    const closestX = x1 + t * dx;
+    const closestY = y1 + t * dy;
+    return Math.sqrt((px - closestX)**2 + (py - closestY)**2);
+}
+
+// 檢查是否太靠近整條怪物路徑
+function getMinDistanceToPath(x, y) {
+    let minD = Infinity;
+    for (let i = 0; i < pathPoints.length - 1; i++) {
+        const p1 = pathPoints[i];
+        const p2 = pathPoints[i+1];
+        const d = getDistanceToSegment(x, y, p1.x, p1.y, p2.x, p2.y);
+        if (d < minD) minD = d;
+    }
+    return minD;
+}
+
+// 繪製與渲染射程圈
+function showRangeIndicator(x, y, range, type) {
+    const rEl = document.getElementById('range-indicator');
+    rEl.style.width = (range * 2) + 'px';
+    rEl.style.height = (range * 2) + 'px';
+    rEl.style.left = x + 'px';
+    rEl.style.top = y + 'px';
+    
+    // 依屬性上色
+    let color = 'rgba(255, 255, 255, 0.45)';
+    let bg = 'rgba(255, 255, 255, 0.05)';
+    if (type === 'fire' || type === 'wildfire' || type === 'ultfire') {
+        color = 'rgba(239, 68, 68, 0.6)';
+        bg = 'rgba(239, 68, 68, 0.08)';
+    } else if (type === 'water' || type === 'steam' || type === 'ultwater') {
+        color = 'rgba(56, 189, 248, 0.6)';
+        bg = 'rgba(56, 189, 248, 0.08)';
+    } else if (type === 'nature' || type === 'ice' || type === 'ultnature') {
+        color = 'rgba(52, 211, 153, 0.6)';
+        bg = 'rgba(52, 211, 153, 0.08)';
+    }
+    
+    rEl.style.borderColor = color;
+    rEl.style.backgroundColor = bg;
+    rEl.style.display = 'block';
+}
+
+function hideRangeIndicator() {
+    document.getElementById('range-indicator').style.display = 'none';
+}
 
 function initGame() {
     const mapEl = document.getElementById('map');
-    mapEl.innerHTML = '';
     
-    // 繪製蛇形路徑
+    // 清空，但保留射程指示圈
+    const rEl = document.getElementById('range-indicator');
+    mapEl.innerHTML = '';
+    mapEl.appendChild(rEl);
+    
+    // 繪製路徑主幹道，精準覆蓋
     for(let i=0; i<pathPoints.length-1; i++) {
-        const p1 = pathPoints[i]; const p2 = pathPoints[i+1];
+        const p1 = pathPoints[i]; 
+        const p2 = pathPoints[i+1];
         const pathLine = document.createElement('div');
-        pathLine.className = 'path';
-        pathLine.style.left = Math.min(p1.x, p2.x) + 'px';
-        pathLine.style.top = Math.min(p1.y, p2.y) + 'px';
-        pathLine.style.width = Math.max(Math.abs(p1.x - p2.x), 16) + 'px'; // 加寬路徑感
-        pathLine.style.height = Math.max(Math.abs(p1.y - p2.y), 16) + 'px';
+        pathLine.className = 'path rounded-full opacity-80';
+        
+        const w = Math.abs(p1.x - p2.x);
+        const h = Math.abs(p1.y - p2.y);
+        
+        pathLine.style.width = (w === 0 ? 16 : w + 16) + 'px';
+        pathLine.style.height = (h === 0 ? 16 : h + 16) + 'px';
+        pathLine.style.left = (Math.min(p1.x, p2.x) - 8) + 'px';
+        pathLine.style.top = (Math.min(p1.y, p2.y) - 8) + 'px';
+        
         mapEl.appendChild(pathLine);
     }
 
     updateUI();
-    gameInterval = setInterval(gameLoop, 30); // 縮短更新間隔，配合雙倍速流暢度
+    // 啟動主更新迴圈
+    gameInterval = setInterval(gameLoop, 30);
 }
 
 function updateUI() {
-    document.getElementById('ui-gold').innerText = game.gold;
+    document.getElementById('ui-gold').innerText = `$${game.gold}`;
     document.getElementById('ui-hp').innerText = game.hp;
-    document.getElementById('ui-wave').innerText = game.currentWave;
-    if (game.hp <= 0) { alert('城堡失守，遊戲結束！'); clearInterval(gameInterval); location.reload(); }
+    document.getElementById('ui-wave').innerText = `${game.currentWave} (無盡)`;
+    
+    if (game.hp <= 0) {
+        showEndGameModal(false);
+    }
 }
 
-// 地圖點擊事件：分流「點到塔」與「點到空地」
+// 地圖點擊處理，自由擺設
 function handleMapClick(e) {
     if (e.target.classList.contains('tower')) {
-        // 點到防禦塔，開升級選單
         selectedTowerId = parseInt(e.target.dataset.id);
         const tower = towers.find(t => t.id === selectedTowerId);
         setupUpgradeMenu(tower);
+        // 展示現有塔的射程
+        showRangeIndicator(tower.x, tower.y, tower.range, tower.type);
         e.stopPropagation();
         return;
     }
     
-    // 點到空地，記錄座標準備蓋塔
     const rect = document.getElementById('map').getBoundingClientRect();
     clickX = e.clientX - rect.left;
     clickY = e.clientY - rect.top;
 
-    // 簡單防重疊碰撞檢查
-    const tooClose = towers.some(t => Math.sqrt((t.x - clickX)**2 + (t.y - clickY)**2) < 26);
-    if(tooClose) return;
+    // 範圍限制，防止點擊蓋在邊緣溢出
+    if (clickX < 15 || clickX > 373 || clickY < 15 || clickY > 305) return;
 
-    document.getElementById('build-menu').style.display = 'block';
-    document.getElementById('upgrade-menu').style.display = 'none';
+    // 1. 禁止蓋在路上：點擊到路徑中心的距離要 > 18
+    const distToPath = getMinDistanceToPath(clickX, clickY);
+    if (distToPath < 20) {
+        triggerToast("不允許建造在道路上！");
+        hideRangeIndicator();
+        closeMenus();
+        return;
+    }
+
+    // 2. 碰撞檢查：不能與現有塔疊合
+    const tooClose = towers.some(t => Math.sqrt((t.x - clickX)**2 + (t.y - clickY)**2) < 26);
+    if (tooClose) {
+        triggerToast("此處位置過於擁擠！");
+        hideRangeIndicator();
+        closeMenus();
+        return;
+    }
+
+    // 展示預覽射程圈 (預設基礎射程為 85)
+    showRangeIndicator(clickX, clickY, 85, 'default');
+
+    // 打開建造選單
+    const menu = document.getElementById('build-menu');
+    menu.classList.remove('hidden');
+    requestAnimationFrame(() => {
+        menu.classList.remove('translate-y-full');
+    });
+    document.getElementById('upgrade-menu').classList.add('hidden');
 }
 
 function closeMenus() {
-    document.getElementById('build-menu').style.display = 'none';
-    document.getElementById('upgrade-menu').style.display = 'none';
+    const buildMenu = document.getElementById('build-menu');
+    const upgradeMenu = document.getElementById('upgrade-menu');
+    
+    buildMenu.classList.add('translate-y-full');
+    upgradeMenu.classList.add('translate-y-full');
+    setTimeout(() => {
+        buildMenu.classList.add('hidden');
+        upgradeMenu.classList.add('hidden');
+    }, 300);
+    hideRangeIndicator();
 }
 
-// 自由建造基礎塔
+// 建造防禦塔
 function buildTower(type) {
-    if (game.gold < game.towerCost) { alert('金幣不足！'); closeMenus(); return; }
+    if (game.gold < game.towerCost) { 
+        triggerToast("金幣不足 $50！"); 
+        closeMenus(); 
+        return; 
+    }
     game.gold -= game.towerCost;
     
     const id = Date.now();
     const mapEl = document.getElementById('map');
     const tEl = document.createElement('div');
-    tEl.className = `tower ${type}`;
+    
+    tEl.className = `tower`;
     tEl.dataset.id = id;
     tEl.style.left = clickX + 'px';
     tEl.style.top = clickY + 'px';
-    tEl.innerText = getTowerName(type);
-    if (type === 'nature') tEl.style.color = '#000';
+    
+    applyTowerStyle(tEl, type);
     mapEl.appendChild(tEl);
 
     towers.push({
-        id: id, el: tEl, type: type, x: clickX, y: clickY,
-        damage: 18, range: 85, lastShot: 0, cooldown: 300, isSplash: false // 攻速雙倍調快
+        id: id, 
+        el: tEl, 
+        type: type, 
+        x: clickX, 
+        y: clickY,
+        damage: 18, 
+        range: 85, 
+        lastShot: 0, 
+        cooldown: 300, 
+        isSplash: false
     });
     
-    closeMenus(); updateUI();
+    triggerToast("防禦塔建造成功！", "success");
+    closeMenus(); 
+    updateUI();
 }
 
-// 動態配置 1、2、3 階升級按鈕
+function applyTowerStyle(el, type) {
+    el.className = 'tower';
+    
+    if (type === 'fire') el.className += ' bg-gradient-to-br from-rose-500 to-red-600 shadow-red-500/20 text-white';
+    else if (type === 'water') el.className += ' bg-gradient-to-br from-sky-400 to-blue-600 shadow-blue-500/20 text-white';
+    else if (type === 'nature') el.className += ' bg-gradient-to-br from-emerald-400 to-green-600 shadow-green-500/20 text-slate-900';
+    
+    else if (type === 'steam') el.className += ' bg-gradient-to-br from-purple-500 to-fuchsia-600 shadow-purple-500/30 text-white ring-1 ring-purple-300';
+    else if (type === 'wildfire') el.className += ' bg-gradient-to-br from-amber-500 to-orange-600 shadow-orange-500/30 text-white ring-1 ring-orange-300';
+    else if (type === 'ice') el.className += ' bg-gradient-to-br from-cyan-300 to-teal-500 shadow-cyan-500/30 text-slate-900 ring-1 ring-cyan-200';
+    
+    else if (type === 'ultwater') el.className += ' bg-gradient-to-br from-blue-700 to-indigo-900 border-2 border-cyan-400 shadow-cyan-500/50 text-white animate-pulse';
+    else if (type === 'ultfire') el.className += ' bg-gradient-to-br from-red-700 to-amber-950 border-2 border-rose-500 shadow-rose-500/50 text-white animate-pulse';
+    else if (type === 'ultnature') el.className += ' bg-gradient-to-br from-emerald-700 to-green-950 border-2 border-green-400 shadow-green-500/50 text-slate-100 animate-pulse';
+    
+    el.innerText = getTowerName(type);
+}
+
 function setupUpgradeMenu(tower) {
     const menu = document.getElementById('upgrade-menu');
     const title = document.getElementById('upgrade-title');
-    const b1 = document.getElementById('up-btn-1'); const b2 = document.getElementById('up-btn-2'); const b3 = document.getElementById('up-btn-3');
+    const b1 = document.getElementById('up-btn-1'); 
+    const b2 = document.getElementById('up-btn-2'); 
+    const b3 = document.getElementById('up-btn-3');
     
-    b1.className = "menu-btn"; b2.className = "menu-btn"; b3.className = "menu-btn";
-    b1.style.display = "none"; b2.style.display = "none"; b3.style.display = "none";
+    b1.className = "p-3 rounded-xl font-bold flex flex-col items-center justify-center transition-all text-xs"; 
+    b2.className = "p-3 rounded-xl font-bold flex flex-col items-center justify-center transition-all text-xs"; 
+    b3.className = "p-3 rounded-xl font-bold flex flex-col items-center justify-center transition-all text-xs";
+    
+    b1.classList.add('hidden'); 
+    b2.classList.add('hidden'); 
+    b3.classList.add('hidden');
 
-    // 1階 升 2階 (花費 $100)
+    // 一階 升 二階 ($100)
     if (['fire', 'water', 'nature'].includes(tower.type)) {
-        title.innerText = `當前：基礎【${getTowerName(tower.type)}】| 融合升級 $100`;
+        title.innerText = `【一階 • ${getTowerName(tower.type)}】融合花費 $100`;
         if(tower.type === 'fire') {
-            b1.innerText = "+水 融合\n蒸汽塔"; b1.classList.add('water'); b1.onclick = () => doUpgrade('steam', game.upgrade2Cost); b1.style.display = "inline-block";
-            b2.innerText = "+草 融合\n野火塔"; b2.classList.add('nature'); b2.onclick = () => doUpgrade('wildfire', game.upgrade2Cost); b2.style.display = "inline-block";
+            b1.innerHTML = "<span>+水 融合</span><span class='text-[10px] opacity-90'>蒸汽塔</span>"; b1.classList.add('bg-gradient-to-br', 'from-purple-500', 'to-fuchsia-600', 'text-white'); b1.onclick = () => doUpgrade('steam', game.upgrade2Cost); b1.classList.remove('hidden');
+            b2.innerHTML = "<span>+草 融合</span><span class='text-[10px] opacity-90'>野火塔</span>"; b2.classList.add('bg-gradient-to-br', 'from-amber-500', 'to-orange-600', 'text-white'); b2.onclick = () => doUpgrade('wildfire', game.upgrade2Cost); b2.classList.remove('hidden');
         }
         if(tower.type === 'water') {
-            b1.innerText = "+火 融合\n蒸汽塔"; b1.classList.add('fire'); b1.onclick = () => doUpgrade('steam', game.upgrade2Cost); b1.style.display = "inline-block";
-            b2.innerText = "+草 融合\n冰霜塔"; b2.classList.add('nature'); b2.onclick = () => doUpgrade('ice', game.upgrade2Cost); b2.style.display = "inline-block";
+            b1.innerHTML = "<span>+火 融合</span><span class='text-[10px] opacity-90'>蒸汽塔</span>"; b1.classList.add('bg-gradient-to-br', 'from-purple-500', 'to-fuchsia-600', 'text-white'); b1.onclick = () => doUpgrade('steam', game.upgrade2Cost); b1.classList.remove('hidden');
+            b2.innerHTML = "<span>+草 融合</span><span class='text-[10px] opacity-90'>冰霜塔</span>"; b2.classList.add('bg-gradient-to-br', 'from-cyan-300', 'to-teal-500', 'text-slate-900'); b2.onclick = () => doUpgrade('ice', game.upgrade2Cost); b2.classList.remove('hidden');
         }
         if(tower.type === 'nature') {
-            b1.innerText = "+火 融合\n野火塔"; b1.classList.add('fire'); b1.onclick = () => doUpgrade('wildfire', game.upgrade2Cost); b1.style.display = "inline-block";
-            b2.innerText = "+水 融合\n冰霜塔"; b2.classList.add('water'); b2.onclick = () => doUpgrade('ice', game.upgrade2Cost); b2.style.display = "inline-block";
-        }
-    } 
-    // 2階 升 3階終極塔 (花費 $200)
-    else if (['steam', 'wildfire', 'ice'].includes(tower.type)) {
-        title.innerText = `當前：進階【${getTowerName(tower.type)}】| 終極覺醒 $200`;
-        if(tower.type === 'steam') {
-            b1.innerText = "覺醒 $\n終極水塔"; b1.classList.add('water'); b1.onclick = () => doUpgrade('ultwater', game.upgrade3Cost); b1.style.display = "inline-block";
-        }
-        if(tower.type === 'wildfire') {
-            b1.innerText = "覺醒 $\n終極火塔"; b1.classList.add('fire'); b1.onclick = () => doUpgrade('ultfire', game.upgrade3Cost); b1.style.display = "inline-block";
-        }
-        if(tower.type === 'ice') {
-            b1.innerText = "覺醒 $\n終極草塔"; b1.classList.add('nature'); b1.onclick = () => doUpgrade('ultnature', game.upgrade3Cost); b1.style.display = "inline-block";
-        }
-    } else {
-        title.innerText = `【終極 ${getTowerName(tower.type)}】已達毀滅級最高型態！`;
-    }
-    menu.style.display = 'block';
-}
-
-function doUpgrade(nextType, cost) {
-    if (game.gold < cost) { alert(`金幣不足 $${cost}！`); closeMenus(); return; }
-    game.gold -= cost;
-    
-    const tower = towers.find(t => t.id === selectedTowerId);
-    tower.type = nextType;
-    
-    // 數值平衡 (搭配雙倍怪速)
-    if (nextType === 'steam') { tower.damage = 45; tower.isSplash = true; tower.range = 100; tower.cooldown = 300; }
-    if (nextType === 'wildfire') { tower.damage = 55; tower.cooldown = 180; tower.range = 95; }
-    if (nextType === 'ice') { tower.damage = 40; tower.cooldown = 400; tower.range = 100; }
-    
-    // 3階終極塔逆天數值
-    if (nextType === 'ultwater') { tower.damage = 150; tower.isSplash = true; tower.range = 130; tower.cooldown = 250; } 
-    if (nextType === 'ultfire') { tower.damage = 260; tower.cooldown = 120; tower.range = 110; } 
-    if (nextType === 'ultnature') { tower.damage = 110; tower.cooldown = 350; tower.range = 140; } 
-
-    // 更新外觀
-    tower.el.className = `tower ${nextType}`;
-    tower.el.innerText = getTowerName(nextType);
-    tower.el.style.color = (['nature','ice','ultnature'].includes(nextType)) ? '#000' : '#fff';
-
-    closeMenus(); updateUI();
-}
-
-function sellTower() {
-    const index = towers.findIndex(t => t.id === selectedTowerId);
-    if (index !== -1) {
-        towers[index].el.remove();
-        towers.splice(index, 1);
-        game.gold += 30;
-    }
-    closeMenus(); updateUI();
-}
-
-function getTowerName(type) {
-    const names = { 'fire':'火', 'water':'水', 'nature':'草', 'steam':'蒸汽', 'wildfire':'野火', 'ice':'冰霜', 'ultwater':'神水', 'ultfire':'神火', 'ultnature':'神草' };
-    return names[type] || '塔';
-}
-
-// --- 雙倍速出怪 (BUG 修正：支援大堆怪連發) ---
-function startNextWave() {
-    if(game.currentWave >= game.maxWave) return;
-    game.currentWave++;
-    updateUI();
-
-    const n = game.currentWave;
-    let baseHp = Math.round(100 * Math.pow(1.25, n - 1));
-    let isBoss = (n % 5 === 0);
-    let spawnCount = isBoss ? 1 : 8;
-    let monsterHp = isBoss ? baseHp * 6 : baseHp;
-    
-    // 兩倍移動速度調校
-    let speed = isBoss ? 2.6 : 4.6; 
-    
-    const elements = ['fire', 'water', 'nature'];
-    const elementNames = { 'fire': '火', 'water': '水', 'nature': '草' };
-    let enemyElement = elements[Math.floor(Math.random() * elements.length)];
-
-    let spawned = 0;
-    const spawnInterval = setInterval(() => {
-        if (spawned < spawnCount) {
-            const mapEl = document.getElementById('map');
-            const enemyEl = document.createElement('div');
-            enemyEl.className = 'enemy' + (isBoss ? ' boss' : '');
-            enemyEl.innerText = elementNames[enemyElement];
-            if(enemyElement === 'fire') enemyEl.style.backgroundColor = '#ff4d4d';
-            if(enemyElement === 'water') enemyEl.style.backgroundColor = '#4da6ff';
-            if(enemyElement === 'nature') enemyEl.style.backgroundColor = '#4dff4d';
-            mapEl.appendChild(enemyEl);
-
-            enemies.push({
-                el: enemyEl, hp: monsterHp, element: enemyElement, speed: speed,
-                pathIndex: 0, x: pathPoints[0].x, y: pathPoints[0].y, goldReward: Math.round(10 + 2 * n)
-            });
-            spawned++;
-        } else { clearInterval(spawnInterval); }
-    }, isBoss ? 0 : 350); // 出怪間隔同步減半
-}
-
-function getDamageMultiplier(towerType, enemyElement) {
-    if (['fire', 'wildfire', 'ultfire'].includes(towerType) && enemyElement === 'nature') return 2.0;
-    if (['nature', 'ice', 'ultnature'].includes(towerType) && enemyElement === 'water') return 2.0;
-    if (['water', 'steam', 'ultwater'].includes(towerType) && enemyElement === 'fire') return 2.0;
-    
-    if (['nature', 'ice', 'ultnature'].includes(towerType) && enemyElement === 'fire') return 0.5;
-    if (['water', 'steam', 'ultwater'].includes(towerType) && enemyElement === 'nature') return 0.5;
-    if (['fire', 'wildfire', 'ultfire'].includes(towerType) && enemyElement === 'water') return 0.5;
-    return 1.0;
-}
-
-// --- 遊戲核心循環 ---
-function gameLoop() {
-    const now = Date.now();
-
-    // 1. 怪物雙倍速移動與光環判定
-    for (let i = enemies.length - 1; i >= 0; i--) {
-        const enemy = enemies[i]; const targetPoint = pathPoints[enemy.pathIndex + 1];
-        if (!targetPoint) { game.hp--; enemy.el.remove(); enemies.splice(i, 1); updateUI(); continue; }
-        
-        const dx = targetPoint.x - enemy.x; const dy = targetPoint.y - enemy.y;
-        const distance = Math.sqrt(dx * dx + dy * dy);
-        
-        let currentSpeed = enemy.speed;
-        
-        // 冰霜塔/終極草塔(全圖控)減速判定
-        const hasUltNature = towers.some(t => t.type === 'ultnature');
-        const nearIce = towers.some(t => t.type === 'ice' && Math.sqrt((enemy.x-t.x)**2 + (enemy.y-t.y)**2) <= t.range);
-        
-        if (hasUltNature && Math.random() < 0.05) currentSpeed = 0; // 神草概率定身
-        else if (nearIce) currentSpeed *= 0.4; // 冰霜強力減速
-
-        if (distance <= currentSpeed) {
-            enemy.x = targetPoint.x; enemy.y = targetPoint.y; enemy.pathIndex++;
-        } else {
-            enemy.x += (dx / distance) * currentSpeed; enemy.y += (dy / distance) * currentSpeed;
-        }
-        enemy.el.style.left = enemy.x + 'px'; enemy.el.style.top = enemy.y + 'px';
-    }
-
-    // 2. 防禦塔雙倍速開火
-    towers.forEach(tower => {
-        if (now - tower.lastShot < tower.cooldown) return;
-        
-        const targetsInRange = enemies.filter(enemy => {
-            return Math.sqrt((enemy.x - tower.x)**2 + (enemy.y - tower.y)**2) <= tower.range;
-        });
-
-        if (targetsInRange.length > 0) {
-            const mainTarget = targetsInRange[0];
-            const mult = getDamageMultiplier(tower.type, mainTarget.element);
-            const dmg = tower.damage * mult;
-            
-            if (tower.isSplash) {
-                enemies.forEach(e => {
-                    if (Math.sqrt((e.x - mainTarget.x)**2 + (e.y - mainTarget.y)**2) <= (tower.type === 'ultwater' ? 60 : 40)) {
-                        e.hp -= dmg;
-                        e.el.style.filter = 'brightness(2.0)';
-                        setTimeout(() => { if(e.el) e.el.style.filter = 'none'; }, 40);
-                    }
-                });
-            } else {
-                mainTarget.hp -= dmg;
-                mainTarget.el.style.backgroundColor = '#fff';
-                setTimeout(() => {
-                    if (mainTarget.el) {
-                        if(mainTarget.element === 'fire') mainTarget.el.style.backgroundColor = '#ff4d4d';
-                        if(mainTarget.element === 'water') mainTarget.el.style.backgroundColor = '#4da6ff';
-                        if(mainTarget.element === 'nature') mainTarget.el.style.backgroundColor = '#4dff4d';
-                    }
-                }, 40);
-            }
-            tower.lastShot = now;
-        }
-    });
-
-    // 3. 死亡清算
-    for (let i = enemies.length - 1; i >= 0; i--) {
-        if (enemies[i].hp <= 0) {
-            game.gold += enemies[i].goldReward;
-            enemies[i].el.remove(); enemies.splice(i, 1); updateUI();
-        }
-    }
-}
-window.onload = initGame;
-</script>
-</body>
-</html>
+            b1.innerHTML = "<span>+火 融合</span><span class='text-[10px] opacity-90'>野火塔</span>"; b1.classList.add('bg-gradient-to-br', 'from-amber-500', 'to-orange-600', 'text-
