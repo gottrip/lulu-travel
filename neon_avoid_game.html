@@ -1,8 +1,25 @@
+啊，真是抱歉！剛才的系統檔案載點可能因為一些限制沒有成功顯示出來，讓您沒辦法順利下載。
+
+別擔心，我直接把這個手機優化版小遊戲的**完整程式碼**放在下方。您可以透過簡單的「複製、貼上」自己做出這個檔案：
+
+### 🛠️ 自製檔案三步驟（超簡單）：
+
+1. 在電腦桌面點擊滑鼠右鍵，選擇 **新增 > 文字文件 (.txt)**。
+2. 把下方框框裡的程式碼**全部複製**，然後**貼上**到剛剛新增的文字文件裡。
+3. 儲存檔案時，選擇「另存新檔」，將檔名改成 **`game.html`**（記得要把副檔名從 `.txt` 改成 `.html`，存檔類型選擇「所有檔案」）。
+
+這樣一來，一個專屬於您的網頁小遊戲檔案就完成了！不論是直接點兩下打開玩，還是上傳到網路上都沒問題。
+
+---
+
+### 📋 完整網頁小遊戲程式碼：
+
+```html
 <!DOCTYPE html>
 <html lang="zh-TW">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>霓虹極速避障 Neon Avoid</title>
     <style>
         * {
@@ -10,41 +27,36 @@
             margin: 0;
             padding: 0;
             user-select: none;
+            -webkit-touch-callout: none;
+            touch-action: none;
         }
         body {
             background-color: #0d0e15;
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
             color: #ffffff;
             display: flex;
             flex-direction: column;
             align-items: center;
-            justify-content: center;
-            min-height: 100vh;
+            justify-content: flex-start;
+            height: 100vh;
             overflow: hidden;
         }
         .container {
             text-align: center;
-            max-width: 500px;
             width: 100%;
-            padding: 10px;
-        }
-        h1 {
-            font-size: 24px;
-            margin-bottom: 10px;
-            text-shadow: 0 0 10px #00f0ff, 0 0 20px #00f0ff;
-            color: #00f0ff;
-            letter-spacing: 2px;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
         }
         .dashboard {
             background: rgba(255, 255, 255, 0.05);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 8px;
-            padding: 12px;
-            margin-bottom: 15px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 10px;
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: 10px;
-            font-size: 13px;
+            gap: 8px;
+            font-size: 12px;
+            z-index: 5;
         }
         .control-group {
             display: flex;
@@ -52,23 +64,25 @@
             align-items: flex-start;
         }
         .control-group label {
-            margin-bottom: 4px;
+            margin-bottom: 2px;
             color: #aaa;
         }
         .control-group input[type="range"] {
             width: 100%;
             accent-color: #ff007f;
             cursor: pointer;
+            height: 20px;
         }
         .stats {
             grid-column: span 2;
             display: flex;
             justify-content: space-between;
             background: rgba(0, 0, 0, 0.3);
-            padding: 6px 12px;
+            padding: 4px 10px;
             border-radius: 4px;
             border-left: 3px solid #ff007f;
             font-weight: bold;
+            font-size: 14px;
         }
         .score-val {
             color: #ff007f;
@@ -80,25 +94,16 @@
         }
         #gameCanvas {
             background: #141521;
-            border: 2px solid #00f0ff;
-            box-shadow: 0 0 15px rgba(0, 240, 255, 0.3);
-            border-radius: 6px;
-            cursor: none;
             display: block;
-            margin: 0 auto;
+            width: 100%;
+            flex-grow: 1;
+            cursor: none;
         }
-        .instructions {
-            margin-top: 12px;
-            font-size: 12px;
-            color: #666;
-            line-height: 1.4;
-        }
-        /* 彈出視窗（遊戲結束） */
         .overlay {
             display: none;
             position: absolute;
             top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(13, 14, 21, 0.85);
+            background: rgba(13, 14, 21, 0.9);
             backdrop-filter: blur(4px);
             flex-direction: column;
             align-items: center;
@@ -112,46 +117,36 @@
             padding: 30px;
             border-radius: 12px;
             text-align: center;
-            max-width: 320px;
-            width: 90%;
+            max-width: 300px;
+            width: 85%;
         }
         .modal h2 {
             color: #ff007f;
-            font-size: 28px;
+            font-size: 26px;
             margin-bottom: 15px;
             text-shadow: 0 0 10px #ff007f;
         }
         .modal p {
             font-size: 16px;
-            margin-bottom: 20px;
+            margin-bottom: 25px;
             color: #ddd;
         }
         .btn {
             background: linear-gradient(45deg, #ff007f, #7f00ff);
             color: white;
             border: none;
-            padding: 10px 24px;
+            padding: 12px 30px;
             font-size: 16px;
             font-weight: bold;
-            border-radius: 20px;
+            border-radius: 25px;
             cursor: pointer;
             box-shadow: 0 0 10px rgba(255, 0, 127, 0.4);
-            transition: transform 0.1s, box-shadow 0.1s;
-        }
-        .btn:hover {
-            transform: scale(1.05);
-            box-shadow: 0 0 15px rgba(255, 0, 127, 0.6);
-        }
-        .btn:active {
-            transform: scale(0.95);
         }
     </style>
 </head>
 <body>
 
     <div class="container">
-        <h1>NEON AVOID</h1>
-        
         <div class="dashboard">
             <div class="control-group">
                 <label for="speedSlider">遊戲速度: <span id="speedVal">1.0</span>x</label>
@@ -167,10 +162,9 @@
             </div>
         </div>
 
-        <div style="position: relative;">
-            <canvas id="gameCanvas" width="400" height="450"></canvas>
+        <div style="position: relative; flex-grow: 1; display: flex; flex-direction: column;">
+            <canvas id="gameCanvas"></canvas>
             
-            <!-- 遊戲結束 Overlay -->
             <div id="gameOverOverlay" class="overlay">
                 <div class="modal">
                     <h2>GAME OVER</h2>
@@ -179,18 +173,12 @@
                 </div>
             </div>
         </div>
-
-        <div class="instructions">
-            操作方式：左右移動滑鼠，或使用鍵盤 <b>← / →</b> 或 <b>A / D</b> 鍵。<br>
-            提示：避開上方掉落的紅色方塊，生存時間越長分數越高！
-        </div>
     </div>
 
     <script>
         const canvas = document.getElementById('gameCanvas');
         const ctx = canvas.getContext('2d');
         
-        // UI 元素
         const speedSlider = document.getElementById('speedSlider');
         const speedVal = document.getElementById('speedVal');
         const densitySlider = document.getElementById('densitySlider');
@@ -201,9 +189,8 @@
         const gameOverOverlay = document.getElementById('gameOverOverlay');
         const restartBtn = document.getElementById('restartBtn');
 
-        // 遊戲變數
         let score = 0;
-        let highScore = localStorage.getItem('neon_avoid_highscore') || 0;
+        let highScore = localStorage.getItem('neon_avoid_mobile_highscore') || 0;
         highScoreEl.textContent = highScore;
         
         let gameActive = true;
@@ -211,21 +198,30 @@
         let densityModifier = 1.0;
         let keys = {};
         
-        // 玩家設定
-        const player = {
-            x: canvas.width / 2 - 15,
-            y: canvas.height - 40,
-            width: 30,
-            height: 30,
-            speed: 7,
-            color: '#00f0ff'
-        };
-
-        // 障礙物陣列
+        let player = { x: 0, y: 0, width: 0, height: 0, speed: 0, color: '#00f0ff' };
         let obstacles = [];
         let spawnTimer = 0;
 
-        // 監聽器
+        function resizeCanvas() {
+            canvas.width = canvas.clientWidth;
+            canvas.height = canvas.clientHeight;
+            
+            const baseSize = Math.min(canvas.width, canvas.height);
+            player.width = baseSize * 0.08;
+            player.height = player.width;
+            player.speed = canvas.width * 0.02;
+
+            player.x = canvas.width / 2 - player.width / 2;
+            player.y = canvas.height - player.height * 1.5;
+
+            obstacles.forEach(obs => {
+                if (obs.x + obs.width > canvas.width) obs.x = canvas.width - obs.width;
+            });
+        }
+
+        window.addEventListener('resize', resizeCanvas);
+        resizeCanvas();
+
         speedSlider.addEventListener('input', (e) => {
             baseSpeed = parseFloat(e.target.value);
             speedVal.textContent = baseSpeed.toFixed(1);
@@ -238,41 +234,36 @@
 
         restartBtn.addEventListener('click', resetGame);
 
-        // 鍵盤操作
         window.addEventListener('keydown', (e) => { keys[e.key] = true; });
         window.addEventListener('keyup', (e) => { keys[e.key] = false; });
 
-        // 滑鼠操作
         canvas.addEventListener('mousemove', (e) => {
+            if (!gameActive) return;
             const rect = canvas.getBoundingClientRect();
-            const root = document.documentElement;
-            const mouseX = e.clientX - rect.left - root.scrollLeft;
-            
-            // 讓玩家中心跟隨滑鼠
-            player.x = mouseX - player.width / 2;
-            
-            // 邊界限制
-            if (player.x < 0) player.x = 0;
-            if (player.x > canvas.width - player.width) player.x = canvas.width - player.width;
+            movePlayerTo(e.clientX - rect.left);
         });
 
-        // 產生障礙物
-        function spawnObstacle() {
-            const size = Math.random() * 25 + 15; // 15 到 40 之間的隨機大小
-            const x = Math.random() * (canvas.width - size);
-            const speed = (Math.random() * 3 + 2) * baseSpeed;
-            
-            obstacles.push({
-                x: x,
-                y: -size,
-                width: size,
-                height: size,
-                speed: speed,
-                color: '#ff007f'
-            });
+        canvas.addEventListener('touchmove', (e) => {
+            if (!gameActive) return;
+            e.preventDefault();
+            const rect = canvas.getBoundingClientRect();
+            movePlayerTo(e.touches[0].clientX - rect.left);
+        }, { passive: false });
+
+        function movePlayerTo(targetX) {
+            player.x = targetX - player.width / 2;
+            if (player.x < 0) player.x = 0;
+            if (player.x > canvas.width - player.width) player.x = canvas.width - player.width;
         }
 
-        // 碰撞檢測
+        function spawnObstacle() {
+            const size = Math.random() * (canvas.width * 0.06) + (canvas.width * 0.03); 
+            const x = Math.random() * (canvas.width - size);
+            const speed = (Math.random() * (canvas.height * 0.005) + (canvas.height * 0.003)) * baseSpeed;
+            
+            obstacles.push({ x: x, y: -size, width: size, height: size, speed: speed, color: '#ff007f' });
+        }
+
         function checkCollision(rect1, rect2) {
             return rect1.x < rect2.x + rect2.width &&
                    rect1.x + rect1.width > rect2.x &&
@@ -280,39 +271,34 @@
                    rect1.y + rect1.height > rect2.y;
         }
 
-        // 重設遊戲
         function resetGame() {
             score = 0;
             scoreEl.textContent = score;
             obstacles = [];
             spawnTimer = 0;
-            player.x = canvas.width / 2 - 15;
+            resizeCanvas();
             gameActive = true;
             gameOverOverlay.style.display = 'none';
             animate();
         }
 
-        // 遊戲結束
         function gameOver() {
             gameActive = false;
             finalScoreEl.textContent = Math.floor(score);
             if (Math.floor(score) > highScore) {
                 highScore = Math.floor(score);
                 highScoreEl.textContent = highScore;
-                localStorage.setItem('neon_avoid_highscore', highScore);
+                localStorage.setItem('neon_avoid_mobile_highscore', highScore);
             }
             gameOverOverlay.style.display = 'flex';
         }
 
-        // 主迴圈
         function animate() {
             if (!gameActive) return;
 
-            // 清除畫布
             ctx.fillStyle = '#141521';
             ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-            // 鍵盤移動更新
             if (keys['ArrowLeft'] || keys['a'] || keys['A']) {
                 player.x -= player.speed;
                 if (player.x < 0) player.x = 0;
@@ -322,15 +308,13 @@
                 if (player.x > canvas.width - player.width) player.x = canvas.width - player.width;
             }
 
-            // 畫玩家 (帶霓虹發光感)
             ctx.shadowBlur = 15;
             ctx.shadowColor = player.color;
             ctx.fillStyle = player.color;
             ctx.fillRect(player.x, player.y, player.width, player.height);
 
-            // 更新與畫障礙物
             spawnTimer += densityModifier;
-            if (spawnTimer >= 25) { // 依密度決定產生頻率
+            if (spawnTimer >= 20) {
                 spawnObstacle();
                 spawnTimer = 0;
             }
@@ -339,19 +323,16 @@
                 let obs = obstacles[i];
                 obs.y += obs.speed;
 
-                // 畫障礙物
                 ctx.shadowBlur = 10;
                 ctx.shadowColor = obs.color;
                 ctx.fillStyle = obs.color;
                 ctx.fillRect(obs.x, obs.y, obs.width, obs.height);
 
-                // 碰撞檢查
                 if (checkCollision(player, obs)) {
                     gameOver();
                     return;
                 }
 
-                // 移出螢幕刪除並加分
                 if (obs.y > canvas.height) {
                     obstacles.splice(i, 1);
                     score += 1;
@@ -359,14 +340,13 @@
                 }
             }
 
-            // 重設 shadowBlur 避免影響其他繪製
             ctx.shadowBlur = 0;
-
             requestAnimationFrame(animate);
         }
 
-        // 啟動遊戲
         animate();
     </script>
 </body>
 </html>
+
+```
