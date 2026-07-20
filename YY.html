@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>無盡挑戰：寵物連連看百分百有聲版</title>
+    <title>無盡挑戰：寵物連連看完美對齊版</title>
     <style>
         * {
             box-sizing: border-box;
@@ -98,9 +98,10 @@
             padding: 12px 30px;
         }
         
-        /* 遊戲舞台 */
+        /* 【關鍵修正】遊戲舞台改為 inline-block，寬高交給內層 Grid 自動撐開，絕對不會歪 */
         #game-container {
             position: relative;
+            display: inline-block;
             background: #34495e;
             border: 4px solid #2c3e50;
             border-radius: 8px;
@@ -145,7 +146,6 @@
 </head>
 <body>
 
-    <!-- 開始首頁（啟用 Web Audio 核心） -->
     <div id="start-screen">
         <h1>🎵 經典寵物連連看 🐾</h1>
         <button class="btn btn-large" onclick="startGameFirstTime()">進入遊戲</button>
@@ -183,7 +183,6 @@ let gameTimer = null;
 const TIME_MAX = 100;
 let baseTimeSpeed = 1.5; 
 
-// =================【 🔥 Web Audio API 原生音效引擎 🔥 】=================
 let audioCtx = null;
 let bgmInterval = null;
 
@@ -196,7 +195,6 @@ function initAudio() {
     }
 }
 
-// 播放單個音符
 function playTone(freq, type, duration, vol = 0.1, delay = 0) {
     if (!audioCtx) return;
     setTimeout(() => {
@@ -205,11 +203,8 @@ function playTone(freq, type, duration, vol = 0.1, delay = 0) {
             let gain = audioCtx.createGain();
             osc.type = type;
             osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
-            
             gain.gain.setValueAtTime(vol, audioCtx.currentTime);
-            // 音量漸弱，聽起來比較自然
             gain.gain.exponentialRampToValueAtTime(0.00001, audioCtx.currentTime + duration);
-            
             osc.connect(gain);
             gain.connect(audioCtx.destination);
             osc.start();
@@ -218,33 +213,26 @@ function playTone(freq, type, duration, vol = 0.1, delay = 0) {
     }, delay * 1000);
 }
 
-// 循環播放 BGM（經典 8-Bit 復古和弦電子樂）
 function startBGM() {
     if (bgmInterval) clearInterval(bgmInterval);
-    
-    // 簡單的 4 拍旋律循環
-    const notes = [261.63, 329.63, 392.00, 329.63, 293.66, 349.23, 440.00, 349.23]; // C-E-G-E, D-F-A-F
+    const notes = [261.63, 329.63, 392.00, 329.63, 293.66, 349.23, 440.00, 349.23];
     let step = 0;
-    
     bgmInterval = setInterval(() => {
-        // 使用極低的音量當背景伴奏，波形用三角波(triangle)比較溫和
         playTone(notes[step % notes.length], 'triangle', 0.4, 0.03);
         step++;
-    }, 400); // 拍子速度
+    }, 400);
 }
 
 function stopBGM() {
     if (bgmInterval) clearInterval(bgmInterval);
 }
 
-// 各種情境音效
 function playSoundClick() { playTone(600, 'sine', 0.05, 0.1); }
 function playSoundMatch() { 
-    playTone(523.25, 'square', 0.1, 0.1); // 快速雙音階
+    playTone(523.25, 'square', 0.1, 0.1);
     playTone(659.25, 'square', 0.15, 0.1, 0.06); 
 }
 function playSoundWin() {
-    let now = 0; // 勝利上升音階
     [523, 587, 659, 698, 784, 880, 987, 1046].forEach((f, i) => {
         playTone(f, 'sine', 0.15, 0.08, i * 0.08);
     });
@@ -254,10 +242,8 @@ function playSoundGameOver() {
     playTone(150, 'sawtooth', 0.4, 0.15, 0.15);
 }
 
-// ======================================================================
-
 function startGameFirstTime() {
-    initAudio(); // 玩家點擊時，瞬間解鎖手機音訊密碼
+    initAudio();
     document.getElementById('start-screen').style.display = 'none';
     startBGM();
     restartGame();
@@ -306,7 +292,8 @@ function initLevel() {
     }
     
     renderBoard();
-    resizeCanvas();
+    // 渲染完網格後，稍微延遲10毫秒給瀏覽器繪製時間，再重整畫布大小
+    setTimeout(resizeCanvas, 10);
     startTimer();
 }
 
@@ -371,14 +358,11 @@ function renderBoard() {
             boardEl.appendChild(cellEl);
         }
     }
-    
-    const container = document.getElementById('game-container');
-    container.style.width = boardEl.offsetWidth + 'px';
-    container.style.height = boardEl.offsetHeight + 'px';
+    // 【修正重點】這裡不再手動用 JS 去改 container 的 width 與 height，放手讓 CSS 自動緊貼！
 }
 
 function onCellClick(e) {
-    initAudio(); // 確保每次觸控都與音訊保持連線
+    initAudio(); 
     playSoundClick();
     
     const cellEl = e.currentTarget;
@@ -504,11 +488,9 @@ function checkWin() {
             if (board[r][c] !== '') return;
         }
     }
-    
     clearInterval(gameTimer);
     stopBGM();
     playSoundWin();
-    
     level++;
     alert(`恭喜通過第 ${level - 1} 關！🎉 準備迎戰第 ${level} 關！`);
     startBGM();
@@ -518,7 +500,7 @@ function checkWin() {
 window.onload = () => {
     window.addEventListener('resize', () => {
         renderBoard();
-        resizeCanvas();
+        setTimeout(resizeCanvas, 10);
     });
 };
 </script>
