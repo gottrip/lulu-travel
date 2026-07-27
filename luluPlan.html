@@ -23,7 +23,7 @@
       background: var(--bg-gradient);
       color: var(--text-main);
       margin: 0;
-      padding: 30px 15px 110px 15px; /* 留足底部空間給固定橫幅 */
+      padding: 30px 15px 110px 15px;
       min-height: 100vh;
     }
 
@@ -122,6 +122,36 @@
       color: #0284c7;
       font-weight: 700;
       opacity: 0.85;
+    }
+
+    /* 專案管理工具列樣式 */
+    .draft-tools-bar {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 20px;
+      background: rgba(255, 255, 255, 0.6);
+      padding: 10px 15px;
+      border-radius: 16px;
+      align-items: center;
+      justify-content: flex-end;
+      flex-wrap: wrap;
+    }
+
+    .btn-tool {
+      background: #ffffff;
+      border: 1px solid #cbd5e1;
+      color: #334155;
+      padding: 6px 12px;
+      border-radius: 10px;
+      font-size: 12px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .btn-tool:hover {
+      background: #f1f5f9;
+      border-color: #94a3b8;
     }
 
     .card, .day-box, .flight-info-box, .total-price-card, .pdf-promo-banner {
@@ -470,7 +500,6 @@
       box-shadow: 0 6px 20px rgba(244, 114, 182, 0.45);
     }
 
-    /* 位於 1 與 2 中間的優惠橫幅卡片 */
     .pdf-promo-banner {
       background: #1e293b;
       color: white;
@@ -479,13 +508,12 @@
       display: flex;
       justify-content: space-between;
       align-items: center;
-      margin-bottom: 25px; /* 與下方步驟2保持間距 */
+      margin-bottom: 25px;
       box-shadow: 0 10px 25px rgba(15, 23, 42, 0.15);
       flex-wrap: wrap;
       gap: 12px;
     }
 
-    /* 螢幕最下方的滿版固定橫幅 (Sticky Bottom Bar) */
     .sticky-bottom-banner {
       position: fixed;
       bottom: 0;
@@ -581,7 +609,6 @@
       background: rgba(255, 255, 255, 0.4);
     }
 
-    /* 頁尾推薦區 */
     .footer-ad-card {
       background: rgba(255, 255, 255, 0.9);
       border: 1.5px solid #bae6fd;
@@ -661,6 +688,18 @@
 </head>
 <body>
 
+<div class="container">
+  <!-- 草稿備份工具列 (暫存/調閱/匯出檔案) -->
+  <div class="draft-tools-bar no-print">
+    <span style="font-size: 12px; color: #0284c7; font-weight: 700; margin-right: auto;">💾 資料管理：</span>
+    <button class="btn-tool" onclick="saveToLocalStorage(true)">💾 儲存草稿</button>
+    <button class="btn-tool" onclick="exportJSON()">📥 下載專案檔 (.json)</button>
+    <button class="btn-tool" onclick="document.getElementById('importFileInput').click()">📤 匯入專案檔</button>
+    <button class="btn-tool" style="color: #ef4444;" onclick="clearDraft()">🗑️ 清空內容</button>
+    <input type="file" id="importFileInput" style="display: none;" accept=".json" onchange="importJSON(event)">
+  </div>
+</div>
+
 <div class="container" id="pdfContent">
   <!-- 頁頭標題 -->
   <div class="header-bar">
@@ -672,7 +711,7 @@
     <div class="destination-box">
       <div class="destination-input-wrapper">
         <span class="destination-icon">✏️</span>
-        <input type="text" class="destination-input" id="destination" placeholder="例如：泰國五日遊" value="泰國五日遊">
+        <input type="text" class="destination-input" id="destination" placeholder="例如：泰國五日遊" value="泰國五日遊" oninput="autoSave()">
       </div>
       <span class="destination-hint no-print">💡 點擊可打字修改標題</span>
     </div>
@@ -687,17 +726,17 @@
     <div class="form-group">
       <div>
         <label>出發日期</label><br>
-        <input type="date" id="startDate" onchange="onDateOrDaysChange('start')">
+        <input type="date" id="startDate" onchange="onDateOrDaysChange('start'); autoSave();">
       </div>
 
       <div>
         <label>旅遊天數</label><br>
-        <input type="number" id="travelDays" placeholder="天數" min="1" style="width: 80px;" oninput="onDateOrDaysChange('days')">
+        <input type="number" id="travelDays" placeholder="天數" min="1" style="width: 80px;" oninput="onDateOrDaysChange('days'); autoSave();">
       </div>
 
       <div>
         <label>回程日期</label><br>
-        <input type="date" id="endDate" onchange="onDateOrDaysChange('end')">
+        <input type="date" id="endDate" onchange="onDateOrDaysChange('end'); autoSave();">
       </div>
     </div>
 
@@ -706,15 +745,15 @@
         <span class="flight-tag">去程航班</span>
         <div>
           <label style="font-size:12px;">航空公司 / 班機號碼</label><br>
-          <input type="text" id="depFlightNo" placeholder="例如：BR383" style="width: 170px;" oninput="autoMatchFlightTime('dep')">
+          <input type="text" id="depFlightNo" placeholder="例如：BR383" style="width: 170px;" oninput="autoMatchFlightTime('dep'); autoSave();">
         </div>
         <div>
           <label style="font-size:12px;">起飛時間</label><br>
-          <input type="time" id="depStartTime">
+          <input type="time" id="depStartTime" oninput="autoSave()">
         </div>
         <div>
           <label style="font-size:12px;">到達時間</label><br>
-          <input type="time" id="depEndTime">
+          <input type="time" id="depEndTime" oninput="autoSave()">
         </div>
         <button class="btn-search-flight no-print" onclick="openGoogleFlightSearch('dep')">🔍 Google 查時間</button>
       </div>
@@ -723,22 +762,22 @@
         <span class="flight-tag return">回程航班</span>
         <div>
           <label style="font-size:12px;">航空公司 / 班機號碼</label><br>
-          <input type="text" id="retFlightNo" placeholder="例如：BR384" style="width: 170px;" oninput="autoMatchFlightTime('ret')">
+          <input type="text" id="retFlightNo" placeholder="例如：BR384" style="width: 170px;" oninput="autoMatchFlightTime('ret'); autoSave();">
         </div>
         <div>
           <label style="font-size:12px;">起飛時間</label><br>
-          <input type="time" id="retStartTime">
+          <input type="time" id="retStartTime" oninput="autoSave()">
         </div>
         <div>
           <label style="font-size:12px;">到達時間</label><br>
-          <input type="time" id="retEndTime">
+          <input type="time" id="retEndTime" oninput="autoSave()">
         </div>
         <button class="btn-search-flight no-print" onclick="openGoogleFlightSearch('ret')">🔍 Google 查時間</button>
       </div>
     </div>
   </div>
 
-  <!-- 位置已調整：位於步驟 1 與 步驟 2 中間的專屬 KLOOK 折扣碼橫幅（會一同輸出進 PDF 中） -->
+  <!-- 步驟 1 與 步驟 2 中間的 KLOOK 折扣碼橫幅 -->
   <div class="pdf-promo-banner">
     <div class="banner-text">
       <span class="banner-badge">🔥 KLOOK 獨家優惠</span>
@@ -777,7 +816,7 @@
       <div class="budget-item">
         <label>✈️ 機票總預估 (TWD/人)</label>
         <div class="cost-input-wrapper">
-          <input type="text" id="flightCost" value="0" oninput="calculateTotal()" placeholder="例如: 15000">
+          <input type="text" id="flightCost" value="0" oninput="calculateTotal(); autoSave();" placeholder="例如: 15000">
         </div>
         <span class="calc-preview" id="flightPreview">= $0</span>
       </div>
@@ -785,7 +824,7 @@
       <div class="budget-item">
         <label>🏨 住宿總預估 (TWD)</label>
         <div class="cost-input-wrapper">
-          <input type="text" id="hotelCost" value="0" oninput="calculateTotal()" placeholder="輸入訂房總價，如 12000">
+          <input type="text" id="hotelCost" value="0" oninput="calculateTotal(); autoSave();" placeholder="輸入訂房總價，如 12000">
         </div>
         <span class="calc-preview" id="hotelPreview">= $0 (平均 $0 / 晚)</span>
       </div>
@@ -834,7 +873,7 @@
   </div>
 </div>
 
-<!-- 螢幕最下方的滿版固定橫幅 (Sticky Bottom Bar) -->
+<!-- 螢幕最下方的滿版固定橫幅 -->
 <div class="sticky-bottom-banner no-print" id="stickyBanner">
   <button class="banner-close-btn" onclick="closeStickyBanner()">✕</button>
   <div class="banner-content">
@@ -862,6 +901,11 @@
     "JX801": { dep: "13:45", arr: "16:45" }
   };
 
+  // 網頁載入時自動讀取草稿
+  window.addEventListener('DOMContentLoaded', () => {
+    loadFromLocalStorage();
+  });
+
   function copyCodeAndGo(code) {
     navigator.clipboard.writeText(code).then(() => {
       alert(`優惠碼【${code}】已複製成功！即將前往 Klook 進行選購。`);
@@ -873,9 +917,7 @@
 
   function closeStickyBanner() {
     const banner = document.getElementById('stickyBanner');
-    if (banner) {
-      banner.style.display = 'none';
-    }
+    if (banner) banner.style.display = 'none';
   }
 
   function autoMatchFlightTime(type) {
@@ -983,7 +1025,7 @@
             ${isFirstDay ? `<span class="route-chip fixed">機場 ✈️</span><span class="arrow-icon">➡️</span>` : ''}
             
             <div class="route-chip">
-              <input type="text" placeholder="${isFirstDay ? '飯店 Check-in' : '景點 A'}">
+              <input type="text" placeholder="${isFirstDay ? '飯店 Check-in' : '景點 A'}" oninput="autoSave()">
             </div>
 
             ${isLastDay ? `<span class="arrow-icon">➡️</span><span class="route-chip fixed">機場 ✈️</span>` : ''}
@@ -994,7 +1036,7 @@
         <div class="input-row">
           <label>當日花費估算 (支援計算式如 80+50+90)</label>
           <div class="cost-input-wrapper">
-            <input type="text" class="day-cost-input" placeholder="例如：80+50+90" oninput="calculateTotal()">
+            <input type="text" class="day-cost-input" placeholder="例如：80+50+90" oninput="calculateTotal(); autoSave();">
             <span class="calc-preview" id="day-calc-${i}">= $0</span>
           </div>
         </div>
@@ -1014,7 +1056,7 @@
     newChipWrapper.innerHTML = `
       <span class="arrow-icon">➡️</span>
       <div class="route-chip">
-        <input type="text" placeholder="新景點">
+        <input type="text" placeholder="新景點" oninput="autoSave()">
         <button class="btn-remove-chip no-print" onclick="removeRouteChip(this)">✕</button>
       </div>
     `;
@@ -1026,11 +1068,13 @@
     } else {
       container.appendChild(newChipWrapper);
     }
+    autoSave();
   }
 
   function removeRouteChip(button) {
     const chipWrapper = button.closest('div').parentElement;
     chipWrapper.remove();
+    autoSave();
   }
 
   function calculateTotal() {
@@ -1066,6 +1110,154 @@
 
     const total = flight + hotelTotal + dailyTotalSum;
     document.getElementById('grandTotal').innerText = total.toLocaleString();
+  }
+
+  /* ================= 暫存與調閱 (LocalStorage & JSON) 核心邏輯 ================= */
+
+  // 抓取全頁面資料
+  function collectFormData() {
+    const daysData = [];
+    for (let i = 1; i <= currentDays; i++) {
+      const flowContainer = document.getElementById(`route-flow-${i}`);
+      const spots = [];
+      if (flowContainer) {
+        const inputs = flowContainer.querySelectorAll('input[type="text"]');
+        inputs.forEach(input => spots.push(input.value));
+      }
+      const costInput = document.querySelectorAll('.day-cost-input')[i - 1];
+      daysData.push({
+        spots: spots,
+        cost: costInput ? costInput.value : ''
+      });
+    }
+
+    return {
+      destination: document.getElementById('destination').value,
+      startDate: document.getElementById('startDate').value,
+      travelDays: document.getElementById('travelDays').value,
+      endDate: document.getElementById('endDate').value,
+      depFlightNo: document.getElementById('depFlightNo').value,
+      depStartTime: document.getElementById('depStartTime').value,
+      depEndTime: document.getElementById('depEndTime').value,
+      retFlightNo: document.getElementById('retFlightNo').value,
+      retStartTime: document.getElementById('retStartTime').value,
+      retEndTime: document.getElementById('retEndTime').value,
+      flightCost: document.getElementById('flightCost').value,
+      hotelCost: document.getElementById('hotelCost').value,
+      daysData: daysData
+    };
+  }
+
+  // 自動背景暫存
+  function autoSave() {
+    saveToLocalStorage(false);
+  }
+
+  // 儲存至瀏覽器 LocalStorage
+  function saveToLocalStorage(showAlert = false) {
+    const data = collectFormData();
+    localStorage.setItem('lulu_plan_draft', JSON.stringify(data));
+    if (showAlert) alert('💾 行程草稿已成功儲存於此瀏覽器！');
+  }
+
+  // 從 LocalStorage 載入
+  function loadFromLocalStorage() {
+    const saved = localStorage.getItem('lulu_plan_draft');
+    if (!saved) return;
+    try {
+      const data = JSON.parse(saved);
+      restoreFormData(data);
+    } catch (e) {
+      console.error(e);
+    }
+  }
+
+  // 還原資料至頁面
+  function restoreFormData(data) {
+    if (data.destination !== undefined) document.getElementById('destination').value = data.destination;
+    if (data.startDate !== undefined) document.getElementById('startDate').value = data.startDate;
+    if (data.travelDays !== undefined) document.getElementById('travelDays').value = data.travelDays;
+    if (data.endDate !== undefined) document.getElementById('endDate').value = data.endDate;
+    
+    if (data.depFlightNo !== undefined) document.getElementById('depFlightNo').value = data.depFlightNo;
+    if (data.depStartTime !== undefined) document.getElementById('depStartTime').value = data.depStartTime;
+    if (data.depEndTime !== undefined) document.getElementById('depEndTime').value = data.depEndTime;
+    
+    if (data.retFlightNo !== undefined) document.getElementById('retFlightNo').value = data.retFlightNo;
+    if (data.retStartTime !== undefined) document.getElementById('retStartTime').value = data.retStartTime;
+    if (data.retEndTime !== undefined) document.getElementById('retEndTime').value = data.retEndTime;
+
+    if (data.flightCost !== undefined) document.getElementById('flightCost').value = data.flightCost;
+    if (data.hotelCost !== undefined) document.getElementById('hotelCost').value = data.hotelCost;
+
+    const daysCount = parseInt(data.travelDays, 10);
+    if (daysCount > 0) {
+      currentDays = daysCount;
+      renderItineraryFields(currentDays);
+
+      if (data.daysData && Array.isArray(data.daysData)) {
+        data.daysData.forEach((dayInfo, i) => {
+          const dayIndex = i + 1;
+          const container = document.getElementById(`route-flow-${dayIndex}`);
+          if (container && dayInfo.spots) {
+            const isLastDay = (dayIndex === daysCount);
+            // 補充所需的動態輸入框
+            while (container.querySelectorAll('input[type="text"]').length < dayInfo.spots.length) {
+              addRouteChip(dayIndex, isLastDay);
+            }
+            const inputs = container.querySelectorAll('input[type="text"]');
+            dayInfo.spots.forEach((spotText, sIdx) => {
+              if (inputs[sIdx]) inputs[sIdx].value = spotText;
+            });
+          }
+          const costInputs = document.querySelectorAll('.day-cost-input');
+          if (costInputs[i] && dayInfo.cost !== undefined) {
+            costInputs[i].value = dayInfo.cost;
+          }
+        });
+      }
+    }
+    calculateTotal();
+  }
+
+  // 清空暫存
+  function clearDraft() {
+    if (confirm('確定要清空目前輸入的所有行程內容嗎？')) {
+      localStorage.removeItem('lulu_plan_draft');
+      location.reload();
+    }
+  }
+
+  // 匯出 JSON 專案檔
+  function exportJSON() {
+    const data = collectFormData();
+    const destName = data.destination.trim() || '旅遊行程';
+    const jsonStr = JSON.stringify(data, null, 2);
+    const blob = new Blob([jsonStr], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `${destName}_專案檔.json`;
+    a.click();
+    URL.revokeObjectURL(url);
+  }
+
+  // 匯入 JSON 專案檔
+  function importJSON(event) {
+    const file = event.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = function(e) {
+      try {
+        const data = JSON.parse(e.target.result);
+        restoreFormData(data);
+        autoSave();
+        alert('📂 行程專案檔已成功匯入！');
+      } catch (err) {
+        alert('匯入失敗：檔案格式不正確。');
+      }
+    };
+    reader.readAsText(file);
   }
 
   function exportToPDF() {
