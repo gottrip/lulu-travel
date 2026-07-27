@@ -64,36 +64,67 @@
       font-weight: 700;
     }
 
+    /* 醒目的可編輯行程名稱區域 */
     .destination-box {
       display: flex;
+      flex-direction: column;
       align-items: center;
-      gap: 8px;
+      gap: 4px;
+    }
+
+    .destination-input-wrapper {
+      position: relative;
+      display: flex;
+      align-items: center;
+    }
+
+    .destination-icon {
+      position: absolute;
+      left: 14px;
+      font-size: 16px;
+      pointer-events: none;
+      opacity: 0.8;
     }
 
     .destination-input {
-      font-size: 20px !important;
-      font-weight: 900 !important;
+      font-size: 18px !important;
+      font-weight: 800 !important;
       color: #0284c7 !important;
-      border: 2px solid #38bdf8 !important;
-      background-color: #ffffff !important;
-      border-radius: 12px !important;
-      padding: 8px 16px !important;
-      width: 220px;
+      border: 2px dashed #38bdf8 !important; /* 改用虛線框強化可編輯感 */
+      background-color: #f0f9ff !important;
+      border-radius: 14px !important;
+      padding: 8px 16px 8px 38px !important;
+      width: 230px;
       text-align: center;
       transition: all 0.2s;
+      cursor: text;
+    }
+
+    .destination-input:hover {
+      border-style: solid !important;
+      background-color: #ffffff !important;
     }
 
     .destination-input::placeholder {
-      font-size: 16px;
+      font-size: 15px;
       font-weight: 500;
       color: #94a3b8;
     }
 
     .destination-input:focus {
+      border-style: solid !important;
+      border-color: #0284c7 !important;
+      background-color: #ffffff !important;
       box-shadow: 0 0 0 4px rgba(56, 189, 248, 0.25) !important;
     }
 
-    /* 防止整塊 Card 與 每日行程區塊在 PDF 被中間裁切 */
+    .destination-hint {
+      font-size: 11px;
+      color: #0284c7;
+      font-weight: 700;
+      opacity: 0.85;
+    }
+
     .card, .day-box, .flight-info-box, .total-price-card {
       page-break-inside: avoid !important;
       break-inside: avoid !important;
@@ -462,14 +493,20 @@
 <body>
 
 <div class="container" id="pdfContent">
+  <!-- 頁頭標題與可輸入行程名稱欄位 -->
   <div class="header-bar">
     <div class="header-title-box">
       <h1>✈️ 輕鬆旅遊行程企劃書</h1>
       <div class="header-subtitle">HAPPY VACATION • TRIP PLANNER</div>
     </div>
 
+    <!-- 醒目的可編輯行程標題 -->
     <div class="destination-box">
-      <input type="text" class="destination-input" id="destination" placeholder="📍 輸入旅遊地點" value="泰國行">
+      <div class="destination-input-wrapper">
+        <span class="destination-icon">✏️</span>
+        <input type="text" class="destination-input" id="destination" placeholder="例如：泰國五日遊" value="泰國五日遊">
+      </div>
+      <span class="destination-hint no-print">💡 點擊可打字修改標題</span>
     </div>
 
     <button class="btn-pdf no-print" onclick="exportToPDF()">📄 下載 PDF 行程表</button>
@@ -497,6 +534,7 @@
     </div>
 
     <div class="flight-info-box">
+      <!-- 去程航班 -->
       <div class="flight-row">
         <span class="flight-tag">去程航班</span>
         <div>
@@ -514,6 +552,7 @@
         <button class="btn-search-flight no-print" onclick="openGoogleFlightSearch('dep')">🔍 Google 查時間</button>
       </div>
 
+      <!-- 回程航班 -->
       <div class="flight-row">
         <span class="flight-tag return">回程航班</span>
         <div>
@@ -798,18 +837,16 @@
     document.getElementById('grandTotal').innerText = total.toLocaleString();
   }
 
-  /* 優化後的 PDF 匯出函數，解決分頁裁切與跨頁亂掉的問題 */
   function exportToPDF() {
     const element = document.getElementById('pdfContent');
     const destName = document.getElementById('destination').value.trim() || '旅遊行程';
     
     const opt = {
-      margin:       [10, 8, 10, 8], // 頁面邊距 [上, 右, 下, 左]
+      margin:       [10, 8, 10, 8],
       filename:     `${destName}_行程企劃書.pdf`,
       image:        { type: 'jpeg', quality: 0.98 },
       html2canvas:  { scale: 2, useCORS: true, logging: false },
       jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' },
-      // 關鍵設定：強制防止元素內部斷頁（avoid-all），並針對指定 class 的區塊智慧避開換頁線
       pagebreak:    { mode: ['avoid-all', 'css', 'legacy'] }
     };
 
