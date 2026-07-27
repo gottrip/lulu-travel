@@ -23,7 +23,7 @@
       background: var(--bg-gradient);
       color: var(--text-main);
       margin: 0;
-      padding: 30px 15px;
+      padding: 30px 15px 110px 15px; /* 留足底部空間給固定橫幅 */
       min-height: 100vh;
     }
 
@@ -64,7 +64,6 @@
       font-weight: 700;
     }
 
-    /* 醒目的可編輯行程名稱區域 */
     .destination-box {
       display: flex;
       flex-direction: column;
@@ -90,7 +89,7 @@
       font-size: 18px !important;
       font-weight: 800 !important;
       color: #0284c7 !important;
-      border: 2px dashed #38bdf8 !important; /* 改用虛線框強化可編輯感 */
+      border: 2px dashed #38bdf8 !important;
       background-color: #f0f9ff !important;
       border-radius: 14px !important;
       padding: 8px 16px 8px 38px !important;
@@ -125,7 +124,7 @@
       opacity: 0.85;
     }
 
-    .card, .day-box, .flight-info-box, .total-price-card {
+    .card, .day-box, .flight-info-box, .total-price-card, .pdf-promo-banner {
       page-break-inside: avoid !important;
       break-inside: avoid !important;
     }
@@ -471,6 +470,172 @@
       box-shadow: 0 6px 20px rgba(244, 114, 182, 0.45);
     }
 
+    /* 位於 1 與 2 中間的優惠橫幅卡片 */
+    .pdf-promo-banner {
+      background: #1e293b;
+      color: white;
+      padding: 14px 22px;
+      border-radius: 18px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 25px; /* 與下方步驟2保持間距 */
+      box-shadow: 0 10px 25px rgba(15, 23, 42, 0.15);
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+
+    /* 螢幕最下方的滿版固定橫幅 (Sticky Bottom Bar) */
+    .sticky-bottom-banner {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      background: #1e293b;
+      color: white;
+      padding: 12px 24px;
+      box-shadow: 0 -6px 25px rgba(0, 0, 0, 0.25);
+      z-index: 9999;
+      box-sizing: border-box;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .banner-content {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+      max-width: 950px;
+      width: 100%;
+      justify-content: space-between;
+      flex-wrap: wrap;
+    }
+
+    .banner-text {
+      font-size: 14px;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .banner-badge {
+      background: #ff5722;
+      color: white;
+      font-size: 12px;
+      font-weight: 800;
+      padding: 4px 10px;
+      border-radius: 8px;
+      white-space: nowrap;
+    }
+
+    .promo-code-box {
+      background: rgba(255, 255, 255, 0.15);
+      border: 1px dashed #ff5722;
+      color: #ffcc80;
+      padding: 3px 10px;
+      border-radius: 8px;
+      font-weight: 800;
+      letter-spacing: 1px;
+    }
+
+    .btn-copy-code {
+      background: #ff5722;
+      color: white;
+      border: none;
+      font-weight: 700;
+      font-size: 13px;
+      padding: 9px 18px;
+      border-radius: 20px;
+      cursor: pointer;
+      transition: all 0.2s;
+      white-space: nowrap;
+    }
+
+    .btn-copy-code:hover {
+      background: #f4511e;
+      transform: scale(1.03);
+    }
+
+    .banner-close-btn {
+      position: absolute;
+      top: 50%;
+      right: 15px;
+      transform: translateY(-50%);
+      background: rgba(255, 255, 255, 0.2);
+      border: none;
+      color: white;
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 12px;
+    }
+
+    .banner-close-btn:hover {
+      background: rgba(255, 255, 255, 0.4);
+    }
+
+    /* 頁尾推薦區 */
+    .footer-ad-card {
+      background: rgba(255, 255, 255, 0.9);
+      border: 1.5px solid #bae6fd;
+      border-radius: 20px;
+      padding: 20px 25px;
+      margin-top: 30px;
+      text-align: center;
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.04);
+    }
+
+    .footer-ad-title {
+      font-size: 13px;
+      font-weight: 800;
+      color: #0284c7;
+      letter-spacing: 1px;
+      margin-bottom: 15px;
+      text-transform: uppercase;
+    }
+
+    .footer-ad-links {
+      display: flex;
+      justify-content: center;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin-bottom: 15px;
+    }
+
+    .btn-ad {
+      background: #f0f9ff;
+      border: 1px solid #7dd3fc;
+      color: #0369a1;
+      padding: 8px 16px;
+      border-radius: 12px;
+      font-size: 13px;
+      font-weight: 700;
+      text-decoration: none;
+      transition: all 0.2s;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .btn-ad:hover {
+      background: #38bdf8;
+      color: white;
+      transform: translateY(-2px);
+    }
+
+    .klook-widget-wrapper {
+      display: flex;
+      justify-content: center;
+      margin-top: 15px;
+    }
+
     @media print {
       body {
         background: #fff;
@@ -487,20 +652,23 @@
         background: #38bdf8 !important;
         -webkit-print-color-adjust: exact;
       }
+      .pdf-promo-banner {
+        background: #1e293b !important;
+        -webkit-print-color-adjust: exact;
+      }
     }
   </style>
 </head>
 <body>
 
 <div class="container" id="pdfContent">
-  <!-- 頁頭標題與可輸入行程名稱欄位 -->
+  <!-- 頁頭標題 -->
   <div class="header-bar">
     <div class="header-title-box">
       <h1>✈️ 輕鬆旅遊行程企劃書</h1>
       <div class="header-subtitle">HAPPY VACATION • TRIP PLANNER</div>
     </div>
 
-    <!-- 醒目的可編輯行程標題 -->
     <div class="destination-box">
       <div class="destination-input-wrapper">
         <span class="destination-icon">✏️</span>
@@ -534,7 +702,6 @@
     </div>
 
     <div class="flight-info-box">
-      <!-- 去程航班 -->
       <div class="flight-row">
         <span class="flight-tag">去程航班</span>
         <div>
@@ -552,7 +719,6 @@
         <button class="btn-search-flight no-print" onclick="openGoogleFlightSearch('dep')">🔍 Google 查時間</button>
       </div>
 
-      <!-- 回程航班 -->
       <div class="flight-row">
         <span class="flight-tag return">回程航班</span>
         <div>
@@ -570,6 +736,15 @@
         <button class="btn-search-flight no-print" onclick="openGoogleFlightSearch('ret')">🔍 Google 查時間</button>
       </div>
     </div>
+  </div>
+
+  <!-- 位置已調整：位於步驟 1 與 步驟 2 中間的專屬 KLOOK 折扣碼橫幅（會一同輸出進 PDF 中） -->
+  <div class="pdf-promo-banner">
+    <div class="banner-text">
+      <span class="banner-badge">🔥 KLOOK 獨家優惠</span>
+      <span>結帳輸入折扣碼 <span class="promo-code-box">SHEEPLU</span> 享精選行程/網卡優惠！</span>
+    </div>
+    <button class="btn-copy-code" onclick="copyCodeAndGo('SHEEPLU')">複製折扣碼並前往 Klook ↗</button>
   </div>
 
   <!-- 步驟 2：每日路線規劃 -->
@@ -631,6 +806,46 @@
   </div>
 </div>
 
+<!-- 頁尾體驗門票推薦與 Widget -->
+<div class="container no-print">
+  <div class="footer-ad-card">
+    <div class="footer-ad-title">🎁 KLOOK 專屬優惠（輸入優惠碼折扣）</div>
+    <div class="footer-ad-links">
+      <a href="https://www.klook.com/zh-TW/" target="_blank" class="btn-ad">🎟️ Klook 門票/網卡/包車專區 ↗ (優惠碼: <b>SHEEPLU</b>)</a>
+    </div>
+
+    <div class="klook-widget-wrapper">
+      <ins class="klk-aff-widget" data-wid="95097" data-adid="1355832" data-actids="131149,46604,2968" data-prod="mul_act" data-price="false" data-lang="" data-width="336" data-height="280" data-currency=""><a href="//www.klook.com/">Klook.com</a></ins>
+      <script type="text/javascript">
+        (function (d, sc, u) {
+          var s = d.createElement(sc),
+            p = d.getElementsByTagName(sc)[0];
+          s.type = "text/javascript";
+          s.async = true;
+          s.src = u;
+          p.parentNode.insertBefore(s, p);
+        })(
+          document,
+          "script",
+          "https://affiliate.klook.com/widget/fetch-iframe-init.js"
+        );
+      </script>
+    </div>
+  </div>
+</div>
+
+<!-- 螢幕最下方的滿版固定橫幅 (Sticky Bottom Bar) -->
+<div class="sticky-bottom-banner no-print" id="stickyBanner">
+  <button class="banner-close-btn" onclick="closeStickyBanner()">✕</button>
+  <div class="banner-content">
+    <div class="banner-text">
+      <span class="banner-badge">🔥 KLOOK 獨家優惠</span>
+      <span>結帳輸入折扣碼 <span class="promo-code-box">SHEEPLU</span> 享精選行程/網卡優惠！</span>
+    </div>
+    <button class="btn-copy-code" onclick="copyCodeAndGo('SHEEPLU')">複製折扣碼並前往 Klook ↗</button>
+  </div>
+</div>
+
 <script>
   let currentDays = 0;
 
@@ -646,6 +861,22 @@
     "JX800": { dep: "08:30", arr: "12:45" },
     "JX801": { dep: "13:45", arr: "16:45" }
   };
+
+  function copyCodeAndGo(code) {
+    navigator.clipboard.writeText(code).then(() => {
+      alert(`優惠碼【${code}】已複製成功！即將前往 Klook 進行選購。`);
+      window.open('https://www.klook.com/zh-TW/', '_blank');
+    }).catch(() => {
+      window.open('https://www.klook.com/zh-TW/', '_blank');
+    });
+  }
+
+  function closeStickyBanner() {
+    const banner = document.getElementById('stickyBanner');
+    if (banner) {
+      banner.style.display = 'none';
+    }
+  }
 
   function autoMatchFlightTime(type) {
     const flightInput = document.getElementById(type === 'dep' ? 'depFlightNo' : 'retFlightNo');
