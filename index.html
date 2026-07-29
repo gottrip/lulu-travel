@@ -247,30 +247,57 @@
       pointer-events: none;
     }
 
-    /* 參團人數控制列 */
-    .traveler-setting-row {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      background: #f0f9ff;
-      border: 1.5px solid #bae6fd;
-      padding: 10px 14px;
-      border-radius: 14px;
+    /* 預算設定面板 (人數與匯率) */
+    .budget-settings-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
       margin-bottom: 16px;
     }
 
-    .traveler-setting-row label {
-      font-size: 13px;
+    .setting-box {
+      background: #f0f9ff;
+      border: 1.5px solid #bae6fd;
+      padding: 10px 12px;
+      border-radius: 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .setting-box label {
+      font-size: 12px;
       color: #0369a1;
       font-weight: 800;
       margin: 0;
     }
 
-    .traveler-input-wrapper {
+    .setting-input-wrapper {
       display: flex;
       align-items: center;
       gap: 4px;
-      width: 100px;
+    }
+
+    .rate-tip-text {
+      font-size: 9.5px;
+      color: #e11d48;
+      font-weight: 700;
+      margin-top: 1px;
+      line-height: 1.2;
+    }
+
+    .rate-link-btn {
+      font-size: 10px;
+      color: #0284c7;
+      text-decoration: none;
+      font-weight: 700;
+      display: inline-flex;
+      align-items: center;
+      gap: 2px;
+      margin-top: 2px;
+    }
+    .rate-link-btn:hover {
+      text-decoration: underline;
     }
 
     /* 航班區塊 */
@@ -898,12 +925,23 @@
   <div class="card">
     <h2>💳 3. 預算試算與比價連結</h2>
     
-    <!-- 參團人數設定列 -->
-    <div class="traveler-setting-row">
-      <label>👥 參團 / 出遊人數：</label>
-      <div class="traveler-input-wrapper">
-        <input type="number" id="travelerCount" value="2" min="1" oninput="calculateTotal(); autoSave();" style="font-weight: 800; text-align: center;">
-        <span style="font-size: 12px; font-weight: 700; color: #0369a1; white-space: nowrap;">人</span>
+    <!-- 參團人數與匯率設定面板 -->
+    <div class="budget-settings-grid">
+      <div class="setting-box">
+        <label>👥 參團人數</label>
+        <div class="setting-input-wrapper">
+          <input type="number" id="travelerCount" value="2" min="1" oninput="calculateTotal(); autoSave();" style="font-weight: 800; text-align: center;">
+          <span style="font-size: 11px; font-weight: 700; color: #0369a1;">人</span>
+        </div>
+      </div>
+
+      <div class="setting-box">
+        <label>💱 當地匯率 (對台幣)</label>
+        <div class="setting-input-wrapper">
+          <input type="number" id="exchangeRate" value="1" step="0.0001" min="0.0001" oninput="calculateTotal(); autoSave();" style="font-weight: 800; text-align: center;">
+        </div>
+        <span class="rate-tip-text">請直接填入台銀現金匯率本行賣出</span>
+        <a href="https://rate.bot.com.tw/xrt?Lang=zh-TW" target="_blank" class="rate-link-btn no-print">🌐 台銀牌告匯率查詢 ↗</a>
       </div>
     </div>
 
@@ -939,11 +977,11 @@
       </div>
 
       <div class="budget-item">
-        <label>🎟️ 每日行程花費小計 (單人合計)</label>
+        <label>🎟️ 每日行程花費小計 (可輸入外幣，自動依匯率換算台幣)</label>
         <div class="cost-input-wrapper">
           <input type="text" id="dailyCostSum" value="0" readonly style="background-color: #f1f5f9;">
         </div>
-        <span class="calc-preview" id="dailyPreview">= 全體共 $0 (每人 $0)</span>
+        <span class="calc-preview" id="dailyPreview">= 全體共 TWD $0 (每人 $0)</span>
       </div>
     </div>
 
@@ -1194,10 +1232,10 @@
         </div>
 
         <div class="input-row">
-          <label>當日單人花費估算 (支援計算式如 80+50+90)</label>
+          <label>當日單人花費估算 (可輸入外幣，自動依匯率換算台幣)</label>
           <div class="cost-input-wrapper">
             <input type="text" class="day-cost-input" placeholder="例如：80+50+90" oninput="calculateTotal(); autoSave();">
-            <span class="calc-preview" id="day-calc-${i}">= 單人 $0</span>
+            <span class="calc-preview" id="day-calc-${i}">= 單人 TWD $0</span>
           </div>
         </div>
       `;
@@ -1250,25 +1288,27 @@
 
   function calculateTotal() {
     const travelerCount = parseInt(document.getElementById('travelerCount').value, 10) || 1;
+    const exchangeRate = parseFloat(document.getElementById('exchangeRate').value) || 1;
 
-    // 1. 每日行程花費（單人加總 * 人數）
+    // 1. 每日行程花費（單人當地金額 * 匯率 * 人數）
     const dayCostInputs = document.querySelectorAll('.day-cost-input');
-    let dailyPerPersonSum = 0;
+    let dailyTwdPerPersonSum = 0;
 
     dayCostInputs.forEach((input, index) => {
       const val = input.value.trim();
-      const calcResult = parseMathExpression(val);
-      dailyPerPersonSum += calcResult;
+      const calcResultForeign = parseMathExpression(val);
+      const calcResultTwd = calcResultForeign * exchangeRate;
+      dailyTwdPerPersonSum += calcResultTwd;
 
       const previewSpan = document.getElementById(`day-calc-${index + 1}`);
       if (previewSpan) {
-        previewSpan.innerText = `= 單人 $${calcResult.toLocaleString()}`;
+        previewSpan.innerText = `= 單人 TWD $${Math.round(calcResultTwd).toLocaleString()}`;
       }
     });
 
-    const totalDailyCost = dailyPerPersonSum * travelerCount;
-    document.getElementById('dailyCostSum').value = totalDailyCost.toLocaleString();
-    document.getElementById('dailyPreview').innerText = `= 全體共 $${totalDailyCost.toLocaleString()} (每人 $${dailyPerPersonSum.toLocaleString()})`;
+    const totalDailyCost = dailyTwdPerPersonSum * travelerCount;
+    document.getElementById('dailyCostSum').value = Math.round(totalDailyCost).toLocaleString();
+    document.getElementById('dailyPreview').innerText = `= 全體共 TWD $${Math.round(totalDailyCost).toLocaleString()} (每人 $${Math.round(dailyTwdPerPersonSum).toLocaleString()})`;
 
     // 2. 機票總金額計算（總金額 ÷ 人數 = 每人機票）
     const totalFlightCost = parseMathExpression(document.getElementById('flightCost').value);
@@ -1291,7 +1331,7 @@
     const totalGrandCost = totalFlightCost + hotelTotal + totalDailyCost;
     const perPersonGrandTotal = Math.round(totalGrandCost / travelerCount);
 
-    document.getElementById('grandTotal').innerText = totalGrandCost.toLocaleString();
+    document.getElementById('grandTotal').innerText = Math.round(totalGrandCost).toLocaleString();
     document.getElementById('perPersonTotal').innerText = perPersonGrandTotal.toLocaleString();
   }
 
@@ -1317,6 +1357,7 @@
       travelDays: document.getElementById('travelDays').value,
       endDate: document.getElementById('endDate').value,
       travelerCount: document.getElementById('travelerCount').value,
+      exchangeRate: document.getElementById('exchangeRate').value,
       depFlightNo: document.getElementById('depFlightNo').value,
       depStartTime: document.getElementById('depStartTime').value,
       depEndTime: document.getElementById('depEndTime').value,
@@ -1356,6 +1397,7 @@
     if (data.travelDays !== undefined) document.getElementById('travelDays').value = data.travelDays;
     if (data.endDate !== undefined) document.getElementById('endDate').value = data.endDate;
     if (data.travelerCount !== undefined) document.getElementById('travelerCount').value = data.travelerCount;
+    if (data.exchangeRate !== undefined) document.getElementById('exchangeRate').value = data.exchangeRate;
     
     if (data.depFlightNo !== undefined) document.getElementById('depFlightNo').value = data.depFlightNo;
     if (data.depStartTime !== undefined) document.getElementById('depStartTime').value = data.depStartTime;
