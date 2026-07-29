@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>輕鬆旅遊行程企劃書</title>
+  <title>旅遊行程規劃與預算計算</title>
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;700;800&family=Noto+Sans+TC:wght@400;500;700;900&family=Caveat:wght@700&display=swap" rel="stylesheet">
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
@@ -23,6 +23,7 @@
 
     * {
       box-sizing: border-box;
+      -webkit-tap-highlight-color: transparent;
     }
 
     body {
@@ -30,12 +31,13 @@
       background: var(--bg-gradient);
       color: var(--text-main);
       margin: 0;
-      padding: 20px 12px 120px 12px;
+      padding: 12px 10px 120px 10px;
       min-height: 100vh;
+      overflow-x: hidden;
     }
 
     .container {
-      max-width: 850px;
+      max-width: 880px;
       margin: 0 auto;
       width: 100%;
     }
@@ -43,12 +45,11 @@
     /* 草稿工具列 */
     .draft-tools-bar {
       display: flex;
-      gap: 8px;
-      margin-bottom: 15px;
-      background: rgba(255, 255, 255, 0.8);
-      backdrop-filter: blur(8px);
-      padding: 10px 16px;
-      border-radius: 16px;
+      gap: 6px;
+      margin-bottom: 12px;
+      background: rgba(255, 255, 255, 0.85);
+      padding: 8px 10px;
+      border-radius: 14px;
       align-items: center;
       justify-content: flex-end;
       flex-wrap: wrap;
@@ -58,229 +59,252 @@
       background: #ffffff;
       border: 1.5px solid #cbd5e1;
       color: #334155;
-      padding: 6px 12px;
-      border-radius: 10px;
-      font-size: 12px;
+      padding: 5px 10px;
+      border-radius: 8px;
+      font-size: 11px;
       font-weight: 700;
       cursor: pointer;
-      transition: all 0.2s;
     }
 
-    .btn-tool:hover {
-      background: #f1f5f9;
-      transform: translateY(-1px);
-    }
-
-    /* 頂部置中主題 Header Banner */
+    /* 手帳旅遊手冊風格 Header */
     .header-bar {
       display: flex;
       flex-direction: column;
       align-items: center;
-      justify-content: center;
-      text-align: center;
-      margin-bottom: 25px;
+      margin-bottom: 16px;
       background: linear-gradient(135deg, #0284c7 0%, #38bdf8 50%, #f472b6 100%);
-      padding: 28px 20px;
-      border-radius: 28px;
-      box-shadow: 0 12px 30px rgba(2, 132, 199, 0.22);
+      padding: 18px 15px;
+      border-radius: 20px;
+      box-shadow: 0 8px 20px rgba(2, 132, 199, 0.2);
       color: white;
-      position: relative;
-      overflow: hidden;
-      gap: 16px;
-      border: 3px solid rgba(255, 255, 255, 0.6);
+      gap: 12px;
+      border: 2px solid rgba(255, 255, 255, 0.6);
+      text-align: center;
     }
 
     .header-title-box {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
+      white-space: nowrap;
     }
 
     .header-title-box h1 {
       margin: 0;
-      font-size: 26px;
+      font-size: 20px;
       color: #ffffff;
       display: flex;
       align-items: center;
       justify-content: center;
-      gap: 10px;
-      text-shadow: 0 2px 6px rgba(0,0,0,0.15);
+      gap: 6px;
+      text-shadow: 0 2px 4px rgba(0,0,0,0.15);
+      white-space: nowrap;
     }
 
     .header-subtitle {
-      font-size: 12px;
+      font-size: 10px;
       color: #ffe4e6;
-      margin-top: 6px;
-      letter-spacing: 1.5px;
+      margin-top: 2px;
+      letter-spacing: 1px;
       font-weight: 800;
-      text-transform: uppercase;
+      white-space: nowrap;
     }
 
     .destination-box {
+      width: 100%;
       display: flex;
       flex-direction: column;
       align-items: center;
-      gap: 6px;
-      width: 100%;
     }
 
     .destination-input-wrapper {
       position: relative;
-      display: flex;
-      align-items: center;
-      justify-content: center;
       width: 100%;
+      max-width: 260px;
     }
 
     .destination-icon {
       position: absolute;
-      left: 16px;
-      font-size: 16px;
+      left: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      font-size: 14px;
       pointer-events: none;
-      opacity: 0.9;
     }
 
     .destination-input {
-      font-size: 18px !important;
+      font-size: 16px !important;
       font-weight: 900 !important;
       color: #0284c7 !important;
       border: 2px dashed #ffffff !important;
       background-color: #ffffff !important;
-      border-radius: 18px !important;
-      padding: 10px 20px 10px 42px !important;
-      width: 260px;
+      border-radius: 14px !important;
+      padding: 8px 12px 8px 32px !important;
+      width: 100%;
       text-align: center;
-      transition: all 0.2s;
-      box-shadow: 0 6px 20px rgba(0,0,0,0.12);
-      cursor: text;
-    }
-
-    .destination-input:hover {
-      border-style: solid !important;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.08);
     }
 
     .destination-hint {
-      font-size: 11px;
+      font-size: 10px;
       color: #ffffff;
       font-weight: 700;
-      opacity: 0.95;
+      margin-top: 3px;
     }
 
     .btn-pdf {
       background: #ffffff;
       color: #0284c7;
       border: none;
-      padding: 12px 28px;
-      border-radius: 18px;
-      font-size: 14px;
+      padding: 10px 16px;
+      border-radius: 14px;
+      font-size: 13px;
       font-weight: 800;
       cursor: pointer;
-      box-shadow: 0 6px 20px rgba(0,0,0,0.12);
-      transition: all 0.2s;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+      width: 100%;
+      max-width: 260px;
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      gap: 8px;
-    }
-
-    .btn-pdf:hover {
-      transform: translateY(-2px) scale(1.02);
-      background: #f0f9ff;
-    }
-
-    .card, .day-box, .flight-info-box, .total-price-card, .pdf-promo-banner {
-      page-break-inside: avoid !important;
-      break-inside: avoid !important;
+      gap: 6px;
+      white-space: nowrap;
     }
 
     .card {
       background: var(--card-bg);
-      padding: 24px 20px;
-      border-radius: 24px;
-      box-shadow: 0 10px 30px rgba(186, 230, 253, 0.2);
-      margin-bottom: 22px;
-      position: relative;
+      padding: 16px 12px;
+      border-radius: 18px;
+      box-shadow: 0 8px 25px rgba(186, 230, 253, 0.2);
+      margin-bottom: 16px;
       border: 1.5px solid #e0f2fe;
       width: 100%;
     }
 
     .card h2 {
       margin-top: 0;
-      font-size: 18px;
+      font-size: 16px;
       color: #0284c7;
       display: flex;
       align-items: center;
-      gap: 8px;
+      gap: 6px;
       border-bottom: 2px dashed #fbcfe8;
-      padding-bottom: 12px;
-      margin-bottom: 20px;
+      padding-bottom: 8px;
+      margin-bottom: 14px;
     }
 
     /* 日期區塊 */
-    .form-group {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-      gap: 15px;
+    .form-group-single-row {
+      display: flex;
+      gap: 6px;
       width: 100%;
+      align-items: flex-end;
+    }
+
+    .date-col-large {
+      flex: 1.3;
+      min-width: 0;
+    }
+
+    .days-col-small {
+      flex: 0.8;
+      min-width: 0;
     }
 
     label {
       font-weight: 700;
-      font-size: 13px;
+      font-size: 10.5px;
       color: #334155;
       display: block;
-      margin-bottom: 6px;
+      margin-bottom: 3px;
+      white-space: nowrap;
     }
 
     input[type="date"], input[type="number"], input[type="text"], input[type="time"] {
-      width: 100%;
-      padding: 10px 14px;
+      width: 100% !important;
+      max-width: 100% !important;
+      padding: 7px 4px !important;
       border: 1.5px solid #cbd5e1;
-      border-radius: 12px;
-      font-size: 14px;
-      transition: all 0.2s;
+      border-radius: 9px;
+      font-size: 11.5px;
       outline: none;
       background-color: #f8fafc;
       color: #334155;
+      text-align: center;
+      -webkit-appearance: none;
+      appearance: none;
     }
 
-    input[type="date"]:focus, input[type="number"]:focus, input[type="text"]:focus, input[type="time"]:focus {
-      border-color: var(--blue-primary);
-      background-color: #fff;
-      box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.2);
+    .days-input-container {
+      position: relative;
+      display: flex;
+      align-items: center;
     }
 
-    /* 航班卡片專屬佈局 */
-    .flight-info-box {
-      margin-top: 20px;
-      padding: 20px;
+    .days-unit-tag {
+      position: absolute;
+      right: 6px;
+      font-size: 10.5px;
+      font-weight: 700;
+      color: #64748b;
+      pointer-events: none;
+    }
+
+    /* 參團人數控制列 */
+    .traveler-setting-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
       background: #f0f9ff;
-      border: 2px dashed #bae6fd;
-      border-radius: 20px;
+      border: 1.5px solid #bae6fd;
+      padding: 10px 14px;
+      border-radius: 14px;
+      margin-bottom: 16px;
+    }
+
+    .traveler-setting-row label {
+      font-size: 13px;
+      color: #0369a1;
+      font-weight: 800;
+      margin: 0;
+    }
+
+    .traveler-input-wrapper {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      width: 100px;
+    }
+
+    /* 航班區塊 */
+    .flight-info-box {
+      margin-top: 12px;
+      padding: 12px 10px;
+      background: #f0f9ff;
+      border: 1.5px dashed #bae6fd;
+      border-radius: 14px;
       display: flex;
       flex-direction: column;
-      gap: 16px;
+      gap: 12px;
     }
 
     .flight-row {
       display: flex;
       flex-direction: column;
-      gap: 12px;
+      gap: 8px;
       background: #ffffff;
-      padding: 16px;
-      border-radius: 16px;
+      padding: 10px;
+      border-radius: 12px;
       border: 1px solid #e0f2fe;
     }
 
     .flight-tag {
       background: #0284c7;
       color: white;
-      padding: 6px 14px;
+      padding: 6px 12px;
       border-radius: 8px;
-      font-size: 12px;
+      font-size: 11px;
       font-weight: 800;
-      display: inline-block;
       align-self: flex-start;
+      white-space: nowrap;
+      flex-shrink: 0;
     }
 
     .flight-tag.return {
@@ -288,40 +312,45 @@
     }
 
     .flight-inputs-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
-      gap: 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
       width: 100%;
-      align-items: end;
+    }
+
+    .time-inputs-row {
+      display: flex;
+      gap: 8px;
+      width: 100%;
+    }
+
+    .time-inputs-row > div {
+      flex: 1;
+      min-width: 0;
     }
 
     .btn-search-flight {
       background: #ffffff;
       border: 1.5px solid #38bdf8;
       color: #0284c7;
-      padding: 10px 14px;
-      border-radius: 10px;
+      padding: 8px;
+      border-radius: 8px;
       font-size: 12px;
       font-weight: 700;
       cursor: pointer;
-      transition: all 0.2s;
       width: 100%;
       text-align: center;
+      margin-top: 2px;
       white-space: nowrap;
     }
 
-    .btn-search-flight:hover {
-      background: #e0f2fe;
-    }
-
-    /* 每日行程手帳風格卡片 */
+    /* 每日行程卡片 */
     .day-box {
-      border-left: 6px solid var(--pink-primary);
-      padding: 18px;
+      border-left: 4px solid var(--pink-primary);
+      padding: 12px 10px;
       background: #fff5f8;
-      margin-bottom: 16px;
-      border-radius: 12px 20px 20px 12px;
-      position: relative;
+      margin-bottom: 12px;
+      border-radius: 8px 14px 14px 8px;
     }
 
     .day-box:nth-child(even) {
@@ -330,17 +359,47 @@
     }
 
     .day-box h3 {
-      margin: 0 0 12px 0;
-      font-size: 16px;
+      margin: 0 0 10px 0;
+      font-size: 14.5px;
       color: #0f172a;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      flex-wrap: wrap;
+    }
+
+    .day-date-tag {
+      font-size: 12px;
+      color: #e11d48;
+      background: #ffe4e6;
+      padding: 2px 8px;
+      border-radius: 6px;
+      font-weight: 800;
+      margin-left: 2px;
+    }
+
+    .day-box:nth-child(even) .day-date-tag {
+      color: #0284c7;
+      background: #e0f2fe;
     }
 
     .route-flow-container {
       display: flex;
-      align-items: center;
       flex-wrap: wrap;
+      align-items: center;
       gap: 8px;
-      margin-bottom: 12px;
+      margin-bottom: 10px;
+    }
+
+    .route-chip-item {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      max-width: 100%;
+    }
+
+    .route-chip-item.wrap-next-line {
+      width: 100%;
     }
 
     .route-chip {
@@ -349,7 +408,8 @@
       background: #ffffff;
       border: 1.5px solid #cbd5e1;
       border-radius: 10px;
-      padding: 4px 10px;
+      padding: 4px 8px;
+      max-width: 100%;
     }
 
     .route-chip.fixed {
@@ -357,15 +417,19 @@
       border-color: #7dd3fc;
       color: #0369a1;
       font-weight: 800;
-      padding: 6px 14px;
+      padding: 6px 10px;
+      font-size: 12px;
     }
 
     .route-chip input[type="text"] {
       border: none !important;
       background: transparent !important;
-      padding: 2px 4px !important;
+      padding: 0 2px !important;
       font-size: 13px !important;
-      width: 105px;
+      font-weight: 600;
+      min-width: 80px;
+      max-width: 200px;
+      width: 80px;
     }
 
     .btn-remove-chip {
@@ -381,6 +445,7 @@
       align-items: center;
       justify-content: center;
       margin-left: 4px;
+      flex-shrink: 0;
     }
 
     .btn-add-chip {
@@ -392,58 +457,51 @@
       font-size: 12px;
       font-weight: 700;
       cursor: pointer;
-    }
-
-    .arrow-icon {
-      color: #f472b6;
-      font-weight: bold;
-      font-size: 15px;
+      margin-top: 4px;
     }
 
     .cost-input-wrapper {
       display: flex;
       align-items: center;
-      gap: 10px;
+      gap: 6px;
     }
 
     .calc-preview {
       font-weight: 800;
       color: #0284c7;
-      font-size: 13px;
+      font-size: 11px;
       white-space: nowrap;
       background: #ffffff;
-      padding: 8px 12px;
-      border-radius: 10px;
+      padding: 6px 8px;
+      border-radius: 8px;
       border: 1px solid #cbd5e1;
     }
 
     .links-row-container {
       display: flex;
-      gap: 12px;
-      flex-wrap: wrap;
-      margin-bottom: 20px;
+      flex-direction: column;
+      gap: 8px;
+      margin-bottom: 16px;
     }
 
     .links-group {
-      flex: 1;
-      min-width: 240px;
       background: #f8fafc;
-      padding: 10px 14px;
-      border-radius: 14px;
+      padding: 8px 10px;
+      border-radius: 12px;
       border: 1px solid #e2e8f0;
       display: flex;
       align-items: center;
-      gap: 8px;
+      gap: 6px;
       flex-wrap: wrap;
     }
 
     .btn-link {
       display: inline-flex;
       align-items: center;
-      padding: 6px 12px;
+      padding: 5px 10px;
       text-decoration: none;
       border-radius: 8px;
-      font-size: 12px;
+      font-size: 11px;
       font-weight: 700;
     }
 
@@ -453,51 +511,89 @@
     .btn-booking { background-color: #0284c7; color: white; }
 
     .budget-section {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-      gap: 15px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
     }
 
     .budget-item {
       display: flex;
       flex-direction: column;
-      gap: 6px;
+      gap: 4px;
       background: #f8fafc;
-      padding: 14px;
-      border-radius: 16px;
+      padding: 10px;
+      border-radius: 12px;
     }
 
+    /* 總預算雙欄卡片樣式 */
     .total-price-card {
       background: linear-gradient(135deg, #0284c7 0%, #f472b6 100%);
       color: white;
-      padding: 20px 25px;
-      border-radius: 20px;
+      padding: 16px 20px;
+      border-radius: 18px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      margin-top: 14px;
+    }
+
+    .budget-split-row {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      margin-top: 20px;
-      box-shadow: 0 10px 25px rgba(2, 132, 199, 0.22);
-      flex-wrap: wrap;
-      gap: 10px;
+      width: 100%;
+    }
+
+    .budget-col-left {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+
+    .budget-col-right {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      gap: 2px;
+    }
+
+    .total-price-label {
+      font-size: 15px;
+      font-weight: 900;
+      letter-spacing: 0.5px;
+      display: flex;
+      flex-direction: column;
+      gap: 1px;
+    }
+
+    .total-price-sublabel {
+      font-size: 10px;
+      font-weight: 700;
+      opacity: 0.85;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
     }
 
     .total-price-value {
-      font-size: 30px;
+      font-size: 22px;
       font-weight: 900;
+    }
+
+    .total-price-value.highlight-total {
+      font-size: 28px;
+      color: #fef08a; /* 總額特別用亮黃色突顯 */
+      text-shadow: 0 2px 4px rgba(0,0,0,0.15);
     }
 
     .pdf-promo-banner {
       background: #1e293b;
       color: white;
-      padding: 16px 22px;
-      border-radius: 20px;
+      padding: 12px 14px;
+      border-radius: 14px;
       display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 22px;
-      box-shadow: 0 10px 25px rgba(15, 23, 42, 0.15);
-      flex-wrap: wrap;
-      gap: 12px;
+      flex-direction: column;
+      gap: 10px;
+      margin-bottom: 16px;
     }
 
     .sticky-bottom-banner {
@@ -507,40 +603,33 @@
       width: 100%;
       background: #1e293b;
       color: white;
-      padding: 12px 20px;
-      box-shadow: 0 -6px 25px rgba(0, 0, 0, 0.25);
+      padding: 10px 14px;
+      box-shadow: 0 -4px 18px rgba(0, 0, 0, 0.25);
       z-index: 9999;
-      box-sizing: border-box;
-      display: flex;
-      justify-content: center;
-      align-items: center;
     }
 
     .banner-content {
       display: flex;
-      align-items: center;
-      justify-content: space-between;
-      max-width: 850px;
+      flex-direction: column;
+      gap: 8px;
       width: 100%;
-      gap: 12px;
-      flex-wrap: wrap;
     }
 
     .banner-badge {
       background: #ff5722;
       color: white;
-      font-size: 11px;
+      font-size: 10px;
       font-weight: 800;
-      padding: 4px 10px;
-      border-radius: 8px;
+      padding: 2px 6px;
+      border-radius: 4px;
     }
 
     .promo-code-box {
       background: rgba(255, 255, 255, 0.15);
       border: 1px dashed #ff5722;
       color: #ffcc80;
-      padding: 3px 8px;
-      border-radius: 8px;
+      padding: 2px 5px;
+      border-radius: 4px;
       font-weight: 800;
     }
 
@@ -549,62 +638,107 @@
       color: white;
       border: none;
       font-weight: 700;
-      font-size: 13px;
-      padding: 9px 18px;
-      border-radius: 20px;
+      font-size: 12px;
+      padding: 8px 12px;
+      border-radius: 12px;
       cursor: pointer;
-      white-space: nowrap;
+      width: 100%;
+      text-align: center;
     }
 
     .banner-close-btn {
       position: absolute;
-      top: 50%;
-      right: 12px;
-      transform: translateY(-50%);
+      top: 8px;
+      right: 10px;
       background: rgba(255, 255, 255, 0.2);
       border: none;
       color: white;
-      width: 22px;
-      height: 22px;
+      width: 20px;
+      height: 20px;
       border-radius: 50%;
-      cursor: pointer;
     }
 
     .footer-ad-card {
       background: rgba(255, 255, 255, 0.9);
       border: 1.5px solid #bae6fd;
-      border-radius: 20px;
-      padding: 20px;
-      margin-top: 25px;
+      border-radius: 16px;
+      padding: 14px;
+      margin-top: 20px;
       text-align: center;
     }
 
-    .footer-ad-title {
-      font-size: 13px;
-      font-weight: 800;
-      color: #0284c7;
-      margin-bottom: 12px;
+    /* 💻 電腦大螢幕優化 (屏寬 > 600px) */
+    @media (min-width: 600px) {
+      body {
+        padding: 30px 15px 120px 15px;
+      }
+      .header-bar {
+        flex-direction: row;
+        padding: 22px 28px;
+        text-align: left;
+        justify-content: space-between;
+      }
+      .destination-box {
+        width: auto;
+      }
+      .btn-pdf {
+        width: auto;
+      }
+      input[type="date"], input[type="number"], input[type="text"], input[type="time"] {
+        font-size: 13.5px;
+        padding: 8px 10px !important;
+      }
+      label {
+        font-size: 12px;
+      }
+      .flight-row {
+        flex-direction: row;
+        align-items: center;
+        gap: 12px;
+      }
+      .flight-inputs-grid {
+        display: grid;
+        grid-template-columns: 1.5fr 1fr 1fr auto;
+        align-items: flex-end;
+      }
+      .time-inputs-row {
+        display: contents;
+      }
+      .btn-search-flight {
+        width: auto;
+        margin-top: 0;
+      }
+      .links-row-container {
+        flex-direction: row;
+      }
+      .budget-section {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      }
+      .total-price-card {
+        padding: 20px 24px;
+      }
+      .total-price-value {
+        font-size: 26px;
+      }
+      .total-price-value.highlight-total {
+        font-size: 32px;
+      }
+      .pdf-promo-banner {
+        flex-direction: row;
+      }
+      .banner-content {
+        flex-direction: row;
+      }
+      .btn-copy-code {
+        width: auto;
+      }
+      .route-chip-item.wrap-next-line {
+        width: auto;
+      }
     }
 
-    .footer-ad-links {
-      display: flex;
-      justify-content: center;
-      gap: 10px;
-      flex-wrap: wrap;
-    }
-
-    .btn-ad {
-      background: #f0f9ff;
-      border: 1px solid #7dd3fc;
-      color: #0369a1;
-      padding: 8px 16px;
-      border-radius: 12px;
-      font-size: 13px;
-      font-weight: 700;
-      text-decoration: none;
-    }
-
-    /* PDF 產出時徹底隱藏所有網頁操作介面 */
+    /* PDF 產出純文字格式樣式 */
     .hide-ui-for-pdf .no-print,
     .hide-ui-for-pdf .btn-pdf,
     .hide-ui-for-pdf .btn-search-flight,
@@ -626,55 +760,16 @@
       box-shadow: none !important;
       font-weight: 800 !important;
       color: #0f172a !important;
+      width: auto !important;
     }
 
     .hide-ui-for-pdf .destination-input {
       color: #ffffff !important;
       font-size: 22px !important;
       background: rgba(255,255,255,0.2) !important;
-      padding: 6px 18px !important;
+      padding: 6px 16px !important;
       border-radius: 12px !important;
       width: auto !important;
-    }
-
-    .hide-ui-for-pdf .card {
-      border: 1px solid #e2e8f0;
-      box-shadow: none;
-    }
-
-    @media print {
-      body {
-        background: #fff;
-        padding: 0;
-      }
-      .no-print, .btn-pdf, .btn-search-flight, .btn-add-chip, .btn-remove-chip, .destination-icon, .destination-hint, .btn-copy-code {
-        display: none !important;
-      }
-      input[type="text"], input[type="date"], input[type="number"], input[type="time"] {
-        border: none !important;
-        background: transparent !important;
-        padding: 0 !important;
-        box-shadow: none !important;
-      }
-      .destination-input {
-        color: #ffffff !important;
-      }
-      .card {
-        box-shadow: none;
-        border: 1px solid #cbd5e1;
-      }
-      .total-price-card {
-        background: linear-gradient(135deg, #0284c7 0%, #f472b6 100%) !important;
-        -webkit-print-color-adjust: exact;
-      }
-      .pdf-promo-banner {
-        background: #1e293b !important;
-        -webkit-print-color-adjust: exact;
-      }
-      .header-bar {
-        background: linear-gradient(135deg, #0284c7 0%, #38bdf8 50%, #f472b6 100%) !important;
-        -webkit-print-color-adjust: exact;
-      }
     }
   </style>
 </head>
@@ -683,17 +778,17 @@
 <div class="container">
   <!-- 草稿工具列 -->
   <div class="draft-tools-bar no-print">
-    <span style="font-size: 12px; color: #0284c7; font-weight: 700; margin-right: auto;">💾 資料管理：</span>
-    <button class="btn-tool" onclick="saveToLocalStorage(true)">💾 儲存草稿</button>
-    <button class="btn-tool" onclick="exportJSON()">📥 下載專案檔 (.json)</button>
-    <button class="btn-tool" onclick="document.getElementById('importFileInput').click()">📤 匯入專案檔</button>
-    <button class="btn-tool" style="color: #ef4444;" onclick="clearDraft()">🗑️ 清空內容</button>
+    <span style="font-size: 11px; color: #0284c7; font-weight: 700; margin-right: auto;">💾 資料管理：</span>
+    <button class="btn-tool" onclick="saveToLocalStorage(true)">💾 儲存</button>
+    <button class="btn-tool" onclick="exportJSON()">📥 匯出</button>
+    <button class="btn-tool" onclick="document.getElementById('importFileInput').click()">📤 匯入</button>
+    <button class="btn-tool" style="color: #ef4444;" onclick="clearDraft()">🗑️ 清空</button>
     <input type="file" id="importFileInput" style="display: none;" accept=".json" onchange="importJSON(event)">
   </div>
 </div>
 
 <div class="container" id="pdfContent">
-  <!-- 完美置中的主題 Header Banner -->
+  <!-- 手帳雜誌感頁頭標題區塊 -->
   <div class="header-bar">
     <div class="header-title-box">
       <h1>✈️ 輕鬆旅遊行程企劃書</h1>
@@ -702,8 +797,8 @@
 
     <div class="destination-box">
       <div class="destination-input-wrapper">
-        <span class="destination-icon no-print">✏️</span>
-        <input type="text" class="destination-input" id="destination" placeholder="例如：泰國五日遊" value="泰國五日遊" oninput="autoSave()">
+        <span class="destination-icon no-print">📝</span>
+        <input type="text" class="destination-input" id="destination" placeholder="例如：泰國五日遊" value="" oninput="autoSave()">
       </div>
       <span class="destination-hint no-print">💡 點擊可打字修改標題</span>
     </div>
@@ -715,18 +810,21 @@
   <div class="card">
     <h2>🗓️ 1. 航班與旅遊日期選擇</h2>
     
-    <div class="form-group">
-      <div>
+    <div class="form-group-single-row">
+      <div class="date-col-large">
         <label>出發日期</label>
         <input type="date" id="startDate" onchange="onDateOrDaysChange('start'); autoSave();">
       </div>
 
-      <div>
+      <div class="days-col-small">
         <label>旅遊天數</label>
-        <input type="number" id="travelDays" placeholder="天數" min="1" oninput="onDateOrDaysChange('days'); autoSave();">
+        <div class="days-input-container">
+          <input type="number" id="travelDays" placeholder="天數" min="1" style="padding-right: 20px !important;" oninput="onDateOrDaysChange('days'); autoSave();">
+          <span class="days-unit-tag">天</span>
+        </div>
       </div>
 
-      <div>
+      <div class="date-col-large">
         <label>回程日期</label>
         <input type="date" id="endDate" onchange="onDateOrDaysChange('end'); autoSave();">
       </div>
@@ -741,13 +839,15 @@
             <label style="font-size:11px;">航空公司 / 班機號碼</label>
             <input type="text" id="depFlightNo" placeholder="例如：BR383" oninput="autoMatchFlightTime('dep'); autoSave();">
           </div>
-          <div>
-            <label style="font-size:11px;">起飛時間</label>
-            <input type="time" id="depStartTime" oninput="autoSave()">
-          </div>
-          <div>
-            <label style="font-size:11px;">到達時間</label>
-            <input type="time" id="depEndTime" oninput="autoSave()">
+          <div class="time-inputs-row">
+            <div>
+              <label style="font-size:11px;">起飛時間</label>
+              <input type="time" id="depStartTime" oninput="autoSave()">
+            </div>
+            <div>
+              <label style="font-size:11px;">到達時間</label>
+              <input type="time" id="depEndTime" oninput="autoSave()">
+            </div>
           </div>
           <button class="btn-search-flight no-print" onclick="openGoogleFlightSearch('dep')">🔍 Google 查時間</button>
         </div>
@@ -761,13 +861,15 @@
             <label style="font-size:11px;">航空公司 / 班機號碼</label>
             <input type="text" id="retFlightNo" placeholder="例如：BR384" oninput="autoMatchFlightTime('ret'); autoSave();">
           </div>
-          <div>
-            <label style="font-size:11px;">起飛時間</label>
-            <input type="time" id="retStartTime" oninput="autoSave()">
-          </div>
-          <div>
-            <label style="font-size:11px;">到達時間</label>
-            <input type="time" id="retEndTime" oninput="autoSave()">
+          <div class="time-inputs-row">
+            <div>
+              <label style="font-size:11px;">起飛時間</label>
+              <input type="time" id="retStartTime" oninput="autoSave()">
+            </div>
+            <div>
+              <label style="font-size:11px;">到達時間</label>
+              <input type="time" id="retEndTime" oninput="autoSave()">
+            </div>
           </div>
           <button class="btn-search-flight no-print" onclick="openGoogleFlightSearch('ret')">🔍 Google 查時間</button>
         </div>
@@ -796,6 +898,15 @@
   <div class="card">
     <h2>💳 3. 預算試算與比價連結</h2>
     
+    <!-- 參團人數設定列 -->
+    <div class="traveler-setting-row">
+      <label>👥 參團 / 出遊人數：</label>
+      <div class="traveler-input-wrapper">
+        <input type="number" id="travelerCount" value="2" min="1" oninput="calculateTotal(); autoSave();" style="font-weight: 800; text-align: center;">
+        <span style="font-size: 12px; font-weight: 700; color: #0369a1; white-space: nowrap;">人</span>
+      </div>
+    </div>
+
     <div class="links-row-container no-print">
       <div class="links-group">
         <span class="links-group-title">✈️ 機票比價：</span>
@@ -812,11 +923,11 @@
 
     <div class="budget-section">
       <div class="budget-item">
-        <label>✈️ 機票總預估 (TWD/人)</label>
+        <label>✈️ 每人機票預估 (TWD/人)</label>
         <div class="cost-input-wrapper">
           <input type="text" id="flightCost" value="0" oninput="calculateTotal(); autoSave();" placeholder="例如: 15000">
         </div>
-        <span class="calc-preview" id="flightPreview">= $0</span>
+        <span class="calc-preview" id="flightPreview">= $0 (共 2 人 $0)</span>
       </div>
 
       <div class="budget-item">
@@ -824,26 +935,44 @@
         <div class="cost-input-wrapper">
           <input type="text" id="hotelCost" value="0" oninput="calculateTotal(); autoSave();" placeholder="輸入訂房總價，如 12000">
         </div>
-        <span class="calc-preview" id="hotelPreview">= $0 (平均 $0 / 晚)</span>
+        <span class="calc-preview" id="hotelPreview">= $0 (平均每人 $0)</span>
       </div>
 
       <div class="budget-item">
-        <label>🎟️ 每日行程花費小計 (TWD)</label>
+        <label>🎟️ 每日行程花費小計 (單人合計)</label>
         <div class="cost-input-wrapper">
           <input type="text" id="dailyCostSum" value="0" readonly style="background-color: #f1f5f9;">
         </div>
-        <span class="calc-preview" id="dailyPreview">= 共 $0</span>
+        <span class="calc-preview" id="dailyPreview">= 全體共 $0 (每人 $0)</span>
       </div>
     </div>
 
+    <!-- 升級版：左側每人平均、右側全體總額 -->
     <div class="total-price-card">
-      <div class="total-price-label">TOTAL ESTIMATED BUDGET<br><span style="font-size:11px; opacity:0.9;">預估旅遊總金額</span></div>
-      <div class="total-price-value">NT$ <span id="grandTotal">0</span></div>
+      <div class="budget-split-row">
+        <!-- 左側：每人平均預算 -->
+        <div class="budget-col-left">
+          <div class="total-price-label">
+            <span>每人平均預算</span>
+            <span class="total-price-sublabel">PER PERSON BUDGET</span>
+          </div>
+          <div class="total-price-value">NT$ <span id="perPersonTotal">0</span></div>
+        </div>
+
+        <!-- 右側：全體總預算 -->
+        <div class="budget-col-right">
+          <div class="total-price-label" style="align-items: flex-end;">
+            <span>預估旅遊總預算</span>
+            <span class="total-price-sublabel">TOTAL ESTIMATED BUDGET</span>
+          </div>
+          <div class="total-price-value highlight-total">NT$ <span id="grandTotal">0</span></div>
+        </div>
+      </div>
     </div>
   </div>
 </div>
 
-<!-- 頁尾體驗門票推薦與 Widget (已設定 no-print) -->
+<!-- 頁尾體驗門票推薦與 Widget -->
 <div class="container no-print">
   <div class="footer-ad-card">
     <div class="footer-ad-title">🎁 KLOOK 專屬優惠（輸入優惠碼折扣）</div>
@@ -871,13 +1000,13 @@
   </div>
 </div>
 
-<!-- 螢幕最下方的滿版固定橫幅 (已設定 no-print) -->
+<!-- 螢幕最下方的滿版固定橫幅 -->
 <div class="sticky-bottom-banner no-print" id="stickyBanner">
   <button class="banner-close-btn" onclick="closeStickyBanner()">✕</button>
   <div class="banner-content">
     <div class="banner-text">
-      <span class="banner-badge">🔥 KLOOK 獨家優惠</span>
-      <span>結帳輸入折扣碼 <span class="promo-code-box">SHEEPLU</span> 享精選行程/網卡優惠！</span>
+      <span class="banner-badge">🔥 KLOOK 優惠</span>
+      <span>結帳輸入 <span class="promo-code-box">SHEEPLU</span> 享優惠！</span>
     </div>
     <button class="btn-copy-code" onclick="copyCodeAndGo('SHEEPLU')">複製折扣碼前往 Klook ↗</button>
   </div>
@@ -899,9 +1028,17 @@
     "JX801": { dep: "13:45", arr: "16:45" }
   };
 
+  const weekDaysCN = ["星期日", "星期一", "星期二", "星期三", "星期四", "星期五", "星期六"];
+
   window.addEventListener('DOMContentLoaded', () => {
     loadFromLocalStorage();
   });
+
+  function adjustInputWidth(input) {
+    const textLen = input.value.length || input.placeholder.length || 4;
+    const newWidth = Math.max(70, Math.min(180, textLen * 12 + 16));
+    input.style.width = newWidth + 'px';
+  }
 
   function triggerConfetti() {
     if (typeof confetti === 'function') {
@@ -1004,6 +1141,8 @@
         currentDays = 0;
         document.getElementById('itineraryContainer').innerHTML = '<p style="color: #64748b; text-align: center; padding: 15px 0;">請選擇有效的日期範圍...</p>';
       }
+    } else {
+      renderItineraryFields(currentDays);
     }
   }
 
@@ -1018,105 +1157,142 @@
     const container = document.getElementById('itineraryContainer');
     container.innerHTML = '';
 
+    const startDateVal = document.getElementById('startDate').value;
+    let startDateObj = startDateVal ? new Date(startDateVal) : null;
+
     for (let i = 1; i <= count; i++) {
       const isFirstDay = (i === 1);
       const isLastDay = (i === count);
 
+      let dateStringTag = '';
+      if (startDateObj) {
+        const currentDate = new Date(startDateObj);
+        currentDate.setDate(startDateObj.getDate() + (i - 1));
+        const month = currentDate.getMonth() + 1;
+        const day = currentDate.getDate();
+        const weekDay = weekDaysCN[currentDate.getDay()];
+        dateStringTag = `<span class="day-date-tag">(${month}/${day} ${weekDay})</span>`;
+      }
+
       const div = document.createElement('div');
       div.className = 'day-box';
       div.innerHTML = `
-        <h3>📍 DAY ${i} 路線與行程規劃</h3>
+        <h3>📍 DAY ${i} ${dateStringTag} 亮點行程與動線</h3>
         <div class="input-row">
-          <label>景點／停留路線 (用 ➡️ 橫向連接)</label>
           <div class="route-flow-container" id="route-flow-${i}">
-            ${isFirstDay ? `<span class="route-chip fixed">機場 ✈️</span><span class="arrow-icon">➡️</span>` : ''}
-            
-            <div class="route-chip">
-              <input type="text" placeholder="${isFirstDay ? '飯店 Check-in' : '景點 A'}" oninput="autoSave()">
+            <div class="route-chip-item">
+              ${isFirstDay ? `<span class="route-chip fixed">機場 ✈️</span><span class="arrow-icon">➡️</span>` : ''}
+              
+              <div class="route-chip">
+                <input type="text" placeholder="${isFirstDay ? '飯店 Check-in' : '地點'}" oninput="adjustInputWidth(this); autoSave();">
+              </div>
             </div>
 
-            ${isLastDay ? `<span class="arrow-icon">➡️</span><span class="route-chip fixed">機場 ✈️</span>` : ''}
+            ${isLastDay ? `<div class="route-chip-item"><span class="arrow-icon">➡️</span><span class="route-chip fixed">機場 ✈️</span></div>` : ''}
           </div>
-          <button class="btn-add-chip no-print" onclick="triggerConfetti(); addRouteChip(${i}, ${isLastDay});">＋ 新增景點</button>
+          <button class="btn-add-chip no-print" onclick="triggerConfetti(); addRouteChip(${i}, ${isLastDay});">＋ 新增地點</button>
         </div>
 
         <div class="input-row">
-          <label>當日花費估算 (支援計算式如 80+50+90)</label>
+          <label>當日單人花費估算 (支援計算式如 80+50+90)</label>
           <div class="cost-input-wrapper">
             <input type="text" class="day-cost-input" placeholder="例如：80+50+90" oninput="calculateTotal(); autoSave();">
-            <span class="calc-preview" id="day-calc-${i}">= $0</span>
+            <span class="calc-preview" id="day-calc-${i}">= 單人 $0</span>
           </div>
         </div>
       `;
       container.appendChild(div);
+
+      const inputs = div.querySelectorAll('.route-chip input[type="text"]');
+      inputs.forEach(input => adjustInputWidth(input));
     }
   }
 
   function addRouteChip(dayIndex, isLastDay) {
     const container = document.getElementById(`route-flow-${dayIndex}`);
+    const chipCount = container.querySelectorAll('.route-chip-item').length;
     
-    const newChipWrapper = document.createElement('div');
-    newChipWrapper.style.display = 'inline-flex';
-    newChipWrapper.style.alignItems = 'center';
-    newChipWrapper.style.gap = '8px';
+    const newChipItem = document.createElement('div');
+    newChipItem.className = 'route-chip-item';
+    
+    if (chipCount >= 1) {
+      newChipItem.classList.add('wrap-next-line');
+    }
 
-    newChipWrapper.innerHTML = `
+    newChipItem.innerHTML = `
       <span class="arrow-icon">➡️</span>
       <div class="route-chip">
-        <input type="text" placeholder="新景點" oninput="autoSave()">
+        <input type="text" placeholder="地點" oninput="adjustInputWidth(this); autoSave();">
         <button class="btn-remove-chip no-print" onclick="removeRouteChip(this)">✕</button>
       </div>
     `;
 
     if (isLastDay) {
-      const lastAirportChip = container.lastElementChild;
-      const lastArrow = lastAirportChip.previousElementSibling;
-      container.insertBefore(newChipWrapper, lastArrow);
+      const lastAirportItem = container.lastElementChild;
+      container.insertBefore(newChipItem, lastAirportItem);
     } else {
-      container.appendChild(newChipWrapper);
+      container.appendChild(newChipItem);
+    }
+
+    const newInput = newChipItem.querySelector('input[type="text"]');
+    if (newInput) {
+      adjustInputWidth(newInput);
+      newInput.focus();
     }
     autoSave();
   }
 
   function removeRouteChip(button) {
-    const chipWrapper = button.closest('div').parentElement;
-    chipWrapper.remove();
+    const chipItem = button.closest('.route-chip-item');
+    chipItem.remove();
     autoSave();
   }
 
   function calculateTotal() {
+    const travelerCount = parseInt(document.getElementById('travelerCount').value, 10) || 1;
+
+    // 1. 每日行程花費（單人加總 * 人數）
     const dayCostInputs = document.querySelectorAll('.day-cost-input');
-    let dailyTotalSum = 0;
+    let dailyPerPersonSum = 0;
 
     dayCostInputs.forEach((input, index) => {
       const val = input.value.trim();
       const calcResult = parseMathExpression(val);
-      dailyTotalSum += calcResult;
+      dailyPerPersonSum += calcResult;
 
       const previewSpan = document.getElementById(`day-calc-${index + 1}`);
       if (previewSpan) {
-        previewSpan.innerText = `= $${calcResult.toLocaleString()}`;
+        previewSpan.innerText = `= 單人 $${calcResult.toLocaleString()}`;
       }
     });
 
-    document.getElementById('dailyCostSum').value = dailyTotalSum.toLocaleString();
-    document.getElementById('dailyPreview').innerText = `= 共 $${dailyTotalSum.toLocaleString()}`;
+    const totalDailyCost = dailyPerPersonSum * travelerCount;
+    document.getElementById('dailyCostSum').value = totalDailyCost.toLocaleString();
+    document.getElementById('dailyPreview').innerText = `= 全體共 $${totalDailyCost.toLocaleString()} (每人 $${dailyPerPersonSum.toLocaleString()})`;
 
-    const flight = parseMathExpression(document.getElementById('flightCost').value);
-    document.getElementById('flightPreview').innerText = `= $${flight.toLocaleString()}`;
+    // 2. 機票總預估（每人機票 * 人數）
+    const flightPerPerson = parseMathExpression(document.getElementById('flightCost').value);
+    const totalFlightCost = flightPerPerson * travelerCount;
+    document.getElementById('flightPreview').innerText = `= $${totalFlightCost.toLocaleString()} (共 ${travelerCount} 人，每人 $${flightPerPerson.toLocaleString()})`;
 
+    // 3. 住宿總預估（總價，計算每人平均分攤）
     const hotelTotal = parseMathExpression(document.getElementById('hotelCost').value);
     const nights = currentDays > 1 ? currentDays - 1 : 0;
+    const perPersonHotel = Math.round(hotelTotal / travelerCount);
     
     if (nights > 0 && hotelTotal > 0) {
       const perNight = Math.round(hotelTotal / nights);
-      document.getElementById('hotelPreview').innerText = `= $${hotelTotal.toLocaleString()} (平均 $${perNight.toLocaleString()} / 晚，共 ${nights} 晚)`;
+      document.getElementById('hotelPreview').innerText = `= $${hotelTotal.toLocaleString()} (平均每人 $${perPersonHotel.toLocaleString()}，每晚 $${perNight.toLocaleString()})`;
     } else {
-      document.getElementById('hotelPreview').innerText = `= $${hotelTotal.toLocaleString()}`;
+      document.getElementById('hotelPreview').innerText = `= $${hotelTotal.toLocaleString()} (平均每人 $${perPersonHotel.toLocaleString()})`;
     }
 
-    const total = flight + hotelTotal + dailyTotalSum;
-    document.getElementById('grandTotal').innerText = total.toLocaleString();
+    // 4. 總預算與每人平均加總
+    const totalGrandCost = totalFlightCost + hotelTotal + totalDailyCost;
+    const perPersonGrandTotal = Math.round(totalGrandCost / travelerCount);
+
+    document.getElementById('grandTotal').innerText = totalGrandCost.toLocaleString();
+    document.getElementById('perPersonTotal').innerText = perPersonGrandTotal.toLocaleString();
   }
 
   function collectFormData() {
@@ -1140,6 +1316,7 @@
       startDate: document.getElementById('startDate').value,
       travelDays: document.getElementById('travelDays').value,
       endDate: document.getElementById('endDate').value,
+      travelerCount: document.getElementById('travelerCount').value,
       depFlightNo: document.getElementById('depFlightNo').value,
       depStartTime: document.getElementById('depStartTime').value,
       depEndTime: document.getElementById('depEndTime').value,
@@ -1178,6 +1355,7 @@
     if (data.startDate !== undefined) document.getElementById('startDate').value = data.startDate;
     if (data.travelDays !== undefined) document.getElementById('travelDays').value = data.travelDays;
     if (data.endDate !== undefined) document.getElementById('endDate').value = data.endDate;
+    if (data.travelerCount !== undefined) document.getElementById('travelerCount').value = data.travelerCount;
     
     if (data.depFlightNo !== undefined) document.getElementById('depFlightNo').value = data.depFlightNo;
     if (data.depStartTime !== undefined) document.getElementById('depStartTime').value = data.depStartTime;
@@ -1206,7 +1384,10 @@
             }
             const inputs = container.querySelectorAll('input[type="text"]');
             dayInfo.spots.forEach((spotText, sIdx) => {
-              if (inputs[sIdx]) inputs[sIdx].value = spotText;
+              if (inputs[sIdx]) {
+                inputs[sIdx].value = spotText;
+                adjustInputWidth(inputs[sIdx]);
+              }
             });
           }
           const costInputs = document.querySelectorAll('.day-cost-input');
