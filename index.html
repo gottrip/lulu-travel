@@ -1,425 +1,1464 @@
 <!DOCTYPE html>
 <html lang="zh-TW">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>旅遊規劃師 盧端祥 LuLu | 專屬您的旅遊顧問</title>
-    <style>
-        /* 全局樣式 */
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-        }
-        body {
-            font-family: 'PingFang TC', 'Microsoft JhengHei', sans-serif;
-            color: #333333;
-            background-color: #faf8f5;
-            line-height: 1.7;
-        }
-        img {
-            max-width: 100%;
-            height: auto;
-        }
-        a {
-            text-decoration: none;
-            transition: all 0.3s ease;
-        }
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>旅遊行程規劃與預算計算</title>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;700;800&family=Noto+Sans+TC:wght@400;500;700;900&family=Caveat:wght@700&display=swap" rel="stylesheet">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
 
-        /* 導覽列 */
-        header {
-            background-color: #ffffff;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
-            position: fixed;
-            width: 100%;
-            top: 0;
-            z-index: 1000;
-        }
-        .nav-container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 15px 20px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-        .logo {
-            font-size: 20px;
-            font-weight: bold;
-            color: #1a365d;
-        }
-        .logo span {
-            color: #dd6b20;
-        }
-        .nav-links {
-            display: flex;
-            list-style: none;
-        }
-        .nav-links li {
-            margin-left: 25px;
-        }
-        .nav-links a {
-            color: #4a5568;
-            font-weight: 500;
-        }
-        .nav-links a:hover {
-            color: #dd6b20;
-        }
+  <style>
+    :root {
+      --pink-primary: #f472b6;
+      --pink-dark: #e11d48;
+      --blue-primary: #38bdf8;
+      --blue-dark: #0284c7;
+      --yellow-sun: #fbbf24;
+      --bg-gradient: linear-gradient(135deg, #e0f2fe 0%, #fce7f3 40%, #fef3c7 100%);
+      --card-bg: #ffffff;
+      --text-main: #1e293b;
+      --text-muted: #64748b;
+    }
 
-        /* Hero 主視覺 */
-        .hero {
-            background: linear-gradient(rgba(26, 54, 93, 0.75), rgba(26, 54, 93, 0.75)), url('https://images.unsplash.com/photo-1469854523086-cc02fe5d8800?auto=format&fit=crop&w=1600&q=80') no-repeat center center/cover;
-            height: 100vh;
-            display: flex;
-            align-items: center;
-            text-align: center;
-            color: #ffffff;
-            padding: 0 20px;
-            padding-top: 70px;
-        }
-        .hero-content {
-            max-width: 800px;
-            margin: 0 auto;
-        }
-        .hero h1 {
-            font-size: 42px;
-            margin-bottom: 20px;
-            font-weight: 700;
-            letter-spacing: 1px;
-            line-height: 1.3;
-        }
-        .hero p {
-            font-size: 18px;
-            margin-bottom: 35px;
-            opacity: 0.95;
-        }
-        .btn {
-            display: inline-block;
-            padding: 14px 35px;
-            border-radius: 50px;
-            font-size: 18px;
-            font-weight: bold;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
-        }
-        .btn-line {
-            background-color: #06c755;
-            color: white;
-        }
-        .btn-line:hover {
-            background-color: #05b04b;
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(6, 199, 85, 0.4);
-        }
+    * {
+      box-sizing: border-box;
+      -webkit-tap-highlight-color: transparent;
+    }
 
-        /* 區塊通用樣式 */
-        section {
-            padding: 90px 20px;
-        }
-        .section-title {
-            text-align: center;
-            font-size: 32px;
-            color: #1a365d;
-            margin-bottom: 50px;
-            position: relative;
-            font-weight: 700;
-        }
-        .section-title::after {
-            content: '';
-            display: block;
-            width: 60px;
-            height: 4px;
-            background-color: #dd6b20;
-            margin: 15px auto 0;
-            border-radius: 2px;
-        }
-        .container {
-            max-width: 1100px;
-            margin: 0 auto;
-        }
+    body {
+      font-family: 'Plus Jakarta Sans', 'Noto Sans TC', -apple-system, sans-serif;
+      background: var(--bg-gradient);
+      color: var(--text-main);
+      margin: 0;
+      padding: 12px 10px 120px 10px;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
 
-        /* 核心服務 */
-        .services {
-            background-color: #ffffff;
-        }
-        .grid-3 {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 30px;
-        }
-        .service-card {
-            background: #faf8f5;
-            padding: 40px 30px;
-            border-radius: 12px;
-            text-align: center;
-            border-top: 5px solid #1a365d;
-            transition: all 0.3s ease;
-        }
-        .service-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 10px 25px rgba(0,0,0,0.05);
-            border-top-color: #dd6b20;
-        }
-        .service-icon {
-            font-size: 40px;
-            margin-bottom: 20px;
-            display: inline-block;
-        }
-        .service-card h3 {
-            font-size: 22px;
-            color: #1a365d;
-            margin-bottom: 15px;
-        }
-        .service-card p {
-            color: #626262;
-            font-size: 15px;
-        }
+    .container {
+      max-width: 880px;
+      margin: 0 auto;
+      width: 100%;
+    }
 
-        /* 關於我 */
-        .about {
-            background-color: #f0f4f8;
-        }
-        .about-flex {
-            display: flex;
-            align-items: center;
-            gap: 50px;
-        }
-        .about-img {
-            flex: 1;
-            text-align: center;
-        }
-        .about-img img {
-            border-radius: 15px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
-            max-width: 380px;
-            width: 100%;
-        }
-        .about-text {
-            flex: 1.2;
-        }
-        .about-text h3 {
-            font-size: 26px;
-            color: #1a365d;
-            margin-bottom: 5px;
-        }
-        .about-text .subtitle {
-            font-size: 16px;
-            color: #dd6b20;
-            font-weight: 600;
-            margin-bottom: 20px;
-        }
-        .about-text p {
-            color: #4a5568;
-            margin-bottom: 15px;
-            font-size: 16px;
-        }
+    /* 草稿工具列 */
+    .draft-tools-bar {
+      display: flex;
+      gap: 6px;
+      margin-bottom: 12px;
+      background: rgba(255, 255, 255, 0.85);
+      padding: 8px 10px;
+      border-radius: 14px;
+      align-items: center;
+      justify-content: flex-end;
+      flex-wrap: wrap;
+    }
 
-        /* 核心優勢 */
-        .advantages {
-            background-color: #ffffff;
-        }
-        .adv-list {
-            max-width: 800px;
-            margin: 0 auto;
-        }
-        .adv-item {
-            display: flex;
-            align-items: flex-start;
-            margin-bottom: 30px;
-            background: #f7fafc;
-            padding: 25px;
-            border-radius: 8px;
-            border-left: 5px solid #dd6b20;
-        }
-        .adv-num {
-            font-size: 24px;
-            font-weight: bold;
-            color: #dd6b20;
-            margin-right: 20px;
-            line-height: 1;
-        }
-        .adv-content h4 {
-            font-size: 18px;
-            color: #1a365d;
-            margin-bottom: 8px;
-            font-weight: 700;
-        }
-        .adv-content p {
-            color: #4a5568;
-            font-size: 15px;
-        }
+    .btn-tool {
+      background: #ffffff;
+      border: 1.5px solid #cbd5e1;
+      color: #334155;
+      padding: 5px 10px;
+      border-radius: 8px;
+      font-size: 11px;
+      font-weight: 700;
+      cursor: pointer;
+    }
 
-        /* CTA 行動呼籲 */
-        .cta-section {
-            background: linear-gradient(rgba(26, 54, 93, 0.9), rgba(26, 54, 93, 0.9)), url('https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=1600&q=80') no-repeat center center/cover;
-            color: white;
-            text-align: center;
-            padding: 100px 20px;
-        }
-        .cta-section h2 {
-            font-size: 36px;
-            margin-bottom: 20px;
-        }
-        .cta-section p {
-            font-size: 18px;
-            margin-bottom: 35px;
-            opacity: 0.9;
-        }
-        .contact-info {
-            margin-top: 40px;
-            font-size: 16px;
-            border-top: 1px solid rgba(255,255,255,0.2);
-            padding-top: 30px;
-            display: inline-block;
-        }
-        .contact-info p {
-            margin-bottom: 8px;
-            opacity: 1;
-        }
+    /* 手帳旅遊手冊風格 Header */
+    .header-bar {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      margin-bottom: 16px;
+      background: linear-gradient(135deg, #0284c7 0%, #38bdf8 50%, #f472b6 100%);
+      padding: 18px 15px;
+      border-radius: 20px;
+      box-shadow: 0 8px 20px rgba(2, 132, 199, 0.2);
+      color: white;
+      gap: 12px;
+      border: 2px solid rgba(255, 255, 255, 0.6);
+      text-align: center;
+    }
 
-        /* 頁尾 */
-        footer {
-            background-color: #1a202c;
-            color: #a0aec0;
-            text-align: center;
-            padding: 20px;
-            font-size: 14px;
-        }
+    .header-title-box {
+      white-space: nowrap;
+    }
 
-        /* RWD 響應式 */
-        @media (max-width: 900px) {
-            .grid-3 {
-                grid-template-columns: 1fr;
-            }
-            .about-flex {
-                flex-direction: column;
-                text-align: center;
-            }
-            .about-img img {
-                max-width: 300px;
-            }
-            .hero h1 {
-                font-size: 32px;
-            }
-            .hero p {
-                font-size: 16px;
-            }
-        }
-    </style>
+    .header-title-box h1 {
+      margin: 0;
+      font-size: 20px;
+      color: #ffffff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      text-shadow: 0 2px 4px rgba(0,0,0,0.15);
+      white-space: nowrap;
+    }
+
+    .header-subtitle {
+      font-size: 10px;
+      color: #ffe4e6;
+      margin-top: 2px;
+      letter-spacing: 1px;
+      font-weight: 800;
+      white-space: nowrap;
+    }
+
+    .destination-box {
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .destination-input-wrapper {
+      position: relative;
+      width: 100%;
+      max-width: 260px;
+    }
+
+    .destination-icon {
+      position: absolute;
+      left: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      font-size: 14px;
+      pointer-events: none;
+    }
+
+    .destination-input {
+      font-size: 16px !important;
+      font-weight: 900 !important;
+      color: #0284c7 !important;
+      border: 2px dashed #ffffff !important;
+      background-color: #ffffff !important;
+      border-radius: 14px !important;
+      padding: 8px 12px 8px 32px !important;
+      width: 100%;
+      text-align: center;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+    }
+
+    .destination-hint {
+      font-size: 10px;
+      color: #ffffff;
+      font-weight: 700;
+      margin-top: 3px;
+    }
+
+    .btn-pdf {
+      background: #ffffff;
+      color: #0284c7;
+      border: none;
+      padding: 10px 16px;
+      border-radius: 14px;
+      font-size: 13px;
+      font-weight: 800;
+      cursor: pointer;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+      width: 100%;
+      max-width: 260px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      white-space: nowrap;
+    }
+
+    .card {
+      background: var(--card-bg);
+      padding: 16px 12px;
+      border-radius: 18px;
+      box-shadow: 0 8px 25px rgba(186, 230, 253, 0.2);
+      margin-bottom: 16px;
+      border: 1.5px solid #e0f2fe;
+      width: 100%;
+    }
+
+    .card h2 {
+      margin-top: 0;
+      font-size: 16px;
+      color: #0284c7;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      border-bottom: 2px dashed #fbcfe8;
+      padding-bottom: 8px;
+      margin-bottom: 14px;
+    }
+
+    /* 日期區塊 */
+    .form-group-single-row {
+      display: flex;
+      gap: 6px;
+      width: 100%;
+      align-items: flex-end;
+    }
+
+    .date-col-large {
+      flex: 1.3;
+      min-width: 0;
+    }
+
+    .days-col-small {
+      flex: 0.8;
+      min-width: 0;
+    }
+
+    label {
+      font-weight: 700;
+      font-size: 10.5px;
+      color: #334155;
+      display: block;
+      margin-bottom: 3px;
+      white-space: nowrap;
+    }
+
+    input[type="date"], input[type="number"], input[type="text"], input[type="time"] {
+      width: 100% !important;
+      max-width: 100% !important;
+      padding: 7px 4px !important;
+      border: 1.5px solid #cbd5e1;
+      border-radius: 9px;
+      font-size: 11.5px;
+      outline: none;
+      background-color: #f8fafc;
+      color: #334155;
+      text-align: center;
+      -webkit-appearance: none;
+      appearance: none;
+    }
+
+    .days-input-container {
+      position: relative;
+      display: flex;
+      align-items: center;
+    }
+
+    .days-unit-tag {
+      position: absolute;
+      right: 6px;
+      font-size: 10.5px;
+      font-weight: 700;
+      color: #64748b;
+      pointer-events: none;
+    }
+
+    /* 參團人數控制列 */
+    .traveler-setting-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: #f0f9ff;
+      border: 1.5px solid #bae6fd;
+      padding: 10px 14px;
+      border-radius: 14px;
+      margin-bottom: 16px;
+    }
+
+    .traveler-setting-row label {
+      font-size: 13px;
+      color: #0369a1;
+      font-weight: 800;
+      margin: 0;
+    }
+
+    .traveler-input-wrapper {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      width: 100px;
+    }
+
+    /* 航班區塊 */
+    .flight-info-box {
+      margin-top: 12px;
+      padding: 12px 10px;
+      background: #f0f9ff;
+      border: 1.5px dashed #bae6fd;
+      border-radius: 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .flight-row {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      background: #ffffff;
+      padding: 10px;
+      border-radius: 12px;
+      border: 1px solid #e0f2fe;
+    }
+
+    .flight-tag {
+      background: #0284c7;
+      color: white;
+      padding: 6px 12px;
+      border-radius: 8px;
+      font-size: 11px;
+      font-weight: 800;
+      align-self: flex-start;
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+
+    .flight-tag.return {
+      background: #f472b6;
+    }
+
+    .flight-inputs-grid {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      width: 100%;
+    }
+
+    .time-inputs-row {
+      display: flex;
+      gap: 8px;
+      width: 100%;
+    }
+
+    .time-inputs-row > div {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .btn-search-flight {
+      background: #ffffff;
+      border: 1.5px solid #38bdf8;
+      color: #0284c7;
+      padding: 8px;
+      border-radius: 8px;
+      font-size: 12px;
+      font-weight: 700;
+      cursor: pointer;
+      width: 100%;
+      text-align: center;
+      margin-top: 2px;
+      white-space: nowrap;
+    }
+
+    /* 每日行程卡片 */
+    .day-box {
+      border-left: 4px solid var(--pink-primary);
+      padding: 12px 10px;
+      background: #fff5f8;
+      margin-bottom: 12px;
+      border-radius: 8px 14px 14px 8px;
+    }
+
+    .day-box:nth-child(even) {
+      border-left-color: var(--blue-primary);
+      background: #f0f9ff;
+    }
+
+    .day-box h3 {
+      margin: 0 0 10px 0;
+      font-size: 14.5px;
+      color: #0f172a;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      flex-wrap: wrap;
+    }
+
+    .day-date-tag {
+      font-size: 12px;
+      color: #e11d48;
+      background: #ffe4e6;
+      padding: 2px 8px;
+      border-radius: 6px;
+      font-weight: 800;
+      margin-left: 2px;
+    }
+
+    .day-box:nth-child(even) .day-date-tag {
+      color: #0284c7;
+      background: #e0f2fe;
+    }
+
+    .route-flow-container {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 10px;
+    }
+
+    .route-chip-item {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      max-width: 100%;
+    }
+
+    .route-chip-item.wrap-next-line {
+      width: 100%;
+    }
+
+    .route-chip {
+      display: inline-flex;
+      align-items: center;
+      background: #ffffff;
+      border: 1.5px solid #cbd5e1;
+      border-radius: 10px;
+      padding: 4px 8px;
+      max-width: 100%;
+    }
+
+    .route-chip.fixed {
+      background: #e0f2fe;
+      border-color: #7dd3fc;
+      color: #0369a1;
+      font-weight: 800;
+      padding: 6px 10px;
+      font-size: 12px;
+    }
+
+    .route-chip input[type="text"] {
+      border: none !important;
+      background: transparent !important;
+      padding: 0 2px !important;
+      font-size: 13px !important;
+      font-weight: 600;
+      min-width: 80px;
+      max-width: 200px;
+      width: 80px;
+    }
+
+    .btn-remove-chip {
+      border: none;
+      background: #fee2e2;
+      color: #ef4444;
+      border-radius: 50%;
+      width: 18px;
+      height: 18px;
+      font-size: 11px;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      margin-left: 4px;
+      flex-shrink: 0;
+    }
+
+    .btn-add-chip {
+      background: #ffffff;
+      border: 1.5px dashed var(--blue-primary);
+      color: var(--blue-dark);
+      padding: 6px 12px;
+      border-radius: 10px;
+      font-size: 12px;
+      font-weight: 700;
+      cursor: pointer;
+      margin-top: 4px;
+    }
+
+    .cost-input-wrapper {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .calc-preview {
+      font-weight: 800;
+      color: #0284c7;
+      font-size: 11px;
+      white-space: nowrap;
+      background: #ffffff;
+      padding: 6px 8px;
+      border-radius: 8px;
+      border: 1px solid #cbd5e1;
+    }
+
+    .links-row-container {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      margin-bottom: 16px;
+    }
+
+    .links-group {
+      background: #f8fafc;
+      padding: 8px 10px;
+      border-radius: 12px;
+      border: 1px solid #e2e8f0;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      flex-wrap: wrap;
+    }
+
+    .btn-link {
+      display: inline-flex;
+      align-items: center;
+      padding: 5px 10px;
+      text-decoration: none;
+      border-radius: 8px;
+      font-size: 11px;
+      font-weight: 700;
+    }
+
+    .btn-skyscanner { background-color: #38bdf8; color: white; }
+    .btn-trip { background-color: #f472b6; color: white; }
+    .btn-agoda { background-color: #fb7185; color: white; }
+    .btn-booking { background-color: #0284c7; color: white; }
+
+    .budget-section {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .budget-item {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      background: #f8fafc;
+      padding: 10px;
+      border-radius: 12px;
+    }
+
+    /* 總預算雙欄卡片樣式 */
+    .total-price-card {
+      background: linear-gradient(135deg, #0284c7 0%, #f472b6 100%);
+      color: white;
+      padding: 16px 20px;
+      border-radius: 18px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      margin-top: 14px;
+    }
+
+    .budget-split-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      width: 100%;
+    }
+
+    .budget-col-left {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+
+    .budget-col-right {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      gap: 2px;
+    }
+
+    .total-price-label {
+      font-size: 15px;
+      font-weight: 900;
+      letter-spacing: 0.5px;
+      display: flex;
+      flex-direction: column;
+      gap: 1px;
+    }
+
+    .total-price-sublabel {
+      font-size: 10px;
+      font-weight: 700;
+      opacity: 0.85;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+    }
+
+    .total-price-value {
+      font-size: 22px;
+      font-weight: 900;
+    }
+
+    .total-price-value.highlight-total {
+      font-size: 28px;
+      color: #fef08a;
+      text-shadow: 0 2px 4px rgba(0,0,0,0.15);
+    }
+
+    .pdf-promo-banner {
+      background: #1e293b;
+      color: white;
+      padding: 12px 14px;
+      border-radius: 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      margin-bottom: 16px;
+    }
+
+    .sticky-bottom-banner {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      background: #1e293b;
+      color: white;
+      padding: 10px 14px;
+      box-shadow: 0 -4px 18px rgba(0, 0, 0, 0.25);
+      z-index: 9999;
+    }
+
+    .banner-content {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      width: 100%;
+    }
+
+    .banner-badge {
+      background: #ff5722;
+      color: white;
+      font-size: 10px;
+      font-weight: 800;
+      padding: 2px 6px;
+      border-radius: 4px;
+    }
+
+    .promo-code-box {
+      background: rgba(255, 255, 255, 0.15);
+      border: 1px dashed #ff5722;
+      color: #ffcc80;
+      padding: 2px 5px;
+      border-radius: 4px;
+      font-weight: 800;
+    }
+
+    .btn-copy-code {
+      background: #ff5722;
+      color: white;
+      border: none;
+      font-weight: 700;
+      font-size: 12px;
+      padding: 8px 12px;
+      border-radius: 12px;
+      cursor: pointer;
+      width: 100%;
+      text-align: center;
+    }
+
+    .banner-close-btn {
+      position: absolute;
+      top: 8px;
+      right: 10px;
+      background: rgba(255, 255, 255, 0.2);
+      border: none;
+      color: white;
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+    }
+
+    .footer-ad-card {
+      background: rgba(255, 255, 255, 0.9);
+      border: 1.5px solid #bae6fd;
+      border-radius: 16px;
+      padding: 14px;
+      margin-top: 20px;
+      text-align: center;
+    }
+
+    /* 💻 電腦大螢幕優化 (屏寬 > 600px) */
+    @media (min-width: 600px) {
+      body {
+        padding: 30px 15px 120px 15px;
+      }
+      .header-bar {
+        flex-direction: row;
+        padding: 22px 28px;
+        text-align: left;
+        justify-content: space-between;
+      }
+      .destination-box {
+        width: auto;
+      }
+      .btn-pdf {
+        width: auto;
+      }
+      input[type="date"], input[type="number"], input[type="text"], input[type="time"] {
+        font-size: 13.5px;
+        padding: 8px 10px !important;
+      }
+      label {
+        font-size: 12px;
+      }
+      .flight-row {
+        flex-direction: row;
+        align-items: center;
+        gap: 12px;
+      }
+      .flight-inputs-grid {
+        display: grid;
+        grid-template-columns: 1.5fr 1fr 1fr auto;
+        align-items: flex-end;
+      }
+      .time-inputs-row {
+        display: contents;
+      }
+      .btn-search-flight {
+        width: auto;
+        margin-top: 0;
+      }
+      .links-row-container {
+        flex-direction: row;
+      }
+      .budget-section {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      }
+      .total-price-card {
+        padding: 20px 24px;
+      }
+      .total-price-value {
+        font-size: 26px;
+      }
+      .total-price-value.highlight-total {
+        font-size: 32px;
+      }
+      .pdf-promo-banner {
+        flex-direction: row;
+      }
+      .banner-content {
+        flex-direction: row;
+      }
+      .btn-copy-code {
+        width: auto;
+      }
+      .route-chip-item.wrap-next-line {
+        width: auto;
+      }
+    }
+
+    /* PDF 產出純文字格式樣式 */
+    .hide-ui-for-pdf .no-print,
+    .hide-ui-for-pdf .btn-pdf,
+    .hide-ui-for-pdf .btn-search-flight,
+    .hide-ui-for-pdf .btn-add-chip,
+    .hide-ui-for-pdf .btn-remove-chip,
+    .hide-ui-for-pdf .destination-icon,
+    .hide-ui-for-pdf .destination-hint,
+    .hide-ui-for-pdf .btn-copy-code {
+      display: none !important;
+    }
+
+    .hide-ui-for-pdf input[type="text"],
+    .hide-ui-for-pdf input[type="date"],
+    .hide-ui-for-pdf input[type="number"],
+    .hide-ui-for-pdf input[type="time"] {
+      border: none !important;
+      background: transparent !important;
+      padding: 0 !important;
+      box-shadow: none !important;
+      font-weight: 800 !important;
+      color: #0f172a !important;
+      width: auto !important;
+    }
+
+    .hide-ui-for-pdf .destination-input {
+      color: #ffffff !important;
+      font-size: 22px !important;
+      background: rgba(255,255,255,0.2) !important;
+      padding: 6px 16px !important;
+      border-radius: 12px !important;
+      width: auto !important;
+    }
+  </style>
 </head>
 <body>
 
-    <!-- 導覽列 -->
-    <header>
-        <div class="nav-container">
-            <div class="logo">LuLu <span>旅遊規劃</span></div>
-            <ul class="nav-links">
-                <li><a href="#services">服務項目</a></li>
-                <li><a href="#about">關於我</a></li>
-                <li><a href="#advantages">核心優勢</a></li>
-                <li><a href="#contact">聯絡諮詢</a></li>
-            </ul>
-        </div>
-    </header>
+<div class="container">
+  <!-- 草稿工具列 -->
+  <div class="draft-tools-bar no-print">
+    <span style="font-size: 11px; color: #0284c7; font-weight: 700; margin-right: auto;">💾 資料管理：</span>
+    <button class="btn-tool" onclick="saveToLocalStorage(true)">💾 儲存</button>
+    <button class="btn-tool" onclick="exportJSON()">📥 匯出</button>
+    <button class="btn-tool" onclick="document.getElementById('importFileInput').click()">📤 匯入</button>
+    <button class="btn-tool" style="color: #ef4444;" onclick="clearDraft()">🗑️ 清空</button>
+    <input type="file" id="importFileInput" style="display: none;" accept=".json" onchange="importJSON(event)">
+  </div>
+</div>
 
-    <!-- Hero 主視覺 -->
-    <section class="hero">
-        <div class="hero-content">
-            <h1>預約下一趟完美出發！<br>專屬您的全方位旅遊規劃專家</h1>
-            <p>厭倦了繁瑣的行程做功課？從熱門跟團、客製化包車到超值清艙特惠，交給專業規劃師 LuLu，讓旅行變得輕鬆又簡單！</p>
-            <a href="https://line.me/ti/p/~0907585858" class="btn btn-line" target="_blank">👉 點我加入 LINE 領取最新旅遊清艙特惠</a>
-        </div>
-    </section>
+<div class="container" id="pdfContent">
+  <!-- 手帳雜誌感頁頭標題區塊 -->
+  <div class="header-bar">
+    <div class="header-title-box">
+      <h1>✈️ 輕鬆旅遊行程企劃書</h1>
+      <div class="header-subtitle">HAPPY VACATION • TRAVEL GUIDEBOOK</div>
+    </div>
 
-    <!-- 核心服務 -->
-    <section id="services" class="services">
-        <div class="container">
-            <h2 class="section-title">核心服務項目</h2>
-            <div class="grid-3">
-                <div class="service-card">
-                    <div class="service-icon">🌍</div>
-                    <h3>精選團體旅遊</h3>
-                    <p>嚴選優質行程，帶您深度體驗世界各地的美好風情，吃喝玩樂通通幫您把關。</p>
-                </div>
-                <div class="service-card">
-                    <div class="service-icon">🔥</div>
-                    <h3>超值清艙特惠</h3>
-                    <p>第一手掌握限時限量「早鳥清艙福利」，用最超值的預算玩遍全球，小資首選。</p>
-                </div>
-                <div class="service-card">
-                    <div class="service-icon">🗺️</div>
-                    <h3>客製化行程規劃</h3>
-                    <p>無論是企業員工旅遊、家族聚會還是好友畢旅，皆可依預算與喜好量身打造專屬行程。</p>
-                </div>
+    <div class="destination-box">
+      <div class="destination-input-wrapper">
+        <span class="destination-icon no-print">📝</span>
+        <input type="text" class="destination-input" id="destination" placeholder="例如：泰國五日遊" value="" oninput="autoSave()">
+      </div>
+      <span class="destination-hint no-print">💡 點擊可打字修改標題</span>
+    </div>
+
+    <button class="btn-pdf no-print" onclick="triggerConfetti(); exportToPDF();">📄 下載 PDF 行程表</button>
+  </div>
+
+  <!-- 步驟 1：日期與航班設定 -->
+  <div class="card">
+    <h2>🗓️ 1. 航班與旅遊日期選擇</h2>
+    
+    <div class="form-group-single-row">
+      <div class="date-col-large">
+        <label>出發日期</label>
+        <input type="date" id="startDate" onchange="onDateOrDaysChange('start'); autoSave();">
+      </div>
+
+      <div class="days-col-small">
+        <label>旅遊天數</label>
+        <div class="days-input-container">
+          <input type="number" id="travelDays" placeholder="天數" min="1" style="padding-right: 20px !important;" oninput="onDateOrDaysChange('days'); autoSave();">
+          <span class="days-unit-tag">天</span>
+        </div>
+      </div>
+
+      <div class="date-col-large">
+        <label>回程日期</label>
+        <input type="date" id="endDate" onchange="onDateOrDaysChange('end'); autoSave();">
+      </div>
+    </div>
+
+    <div class="flight-info-box">
+      <!-- 去程航班 -->
+      <div class="flight-row">
+        <span class="flight-tag">去程航班</span>
+        <div class="flight-inputs-grid">
+          <div>
+            <label style="font-size:11px;">航空公司 / 班機號碼</label>
+            <input type="text" id="depFlightNo" placeholder="例如：BR383" oninput="autoMatchFlightTime('dep'); autoSave();">
+          </div>
+          <div class="time-inputs-row">
+            <div>
+              <label style="font-size:11px;">起飛時間</label>
+              <input type="time" id="depStartTime" oninput="autoSave()">
             </div>
-        </div>
-    </section>
-
-    <!-- 關於我 -->
-    <section id="about" class="about">
-        <div class="container">
-            <div class="about-flex">
-                <div class="about-img">
-                    <!-- 預留您的照片，這裡先用高質感旅行意境圖代替 -->
-                    <img src="https://images.unsplash.com/photo-1488646953014-85cb44e25828?auto=format&fit=crop&w=600&q=80" alt="旅遊規劃師 LuLu">
-                </div>
-                <div class="about-text">
-                    <h3>旅遊規劃師 ｜ 盧端祥 (LuLu)</h3>
-                    <p class="subtitle">我在「找到了旅行社」為您服務</p>
-                    <p>嗨！我是 LuLu。旅行不只是轉換地點，更是充實靈魂、創造珍貴回憶的過程。然而，完美的旅行背後往往需要耗費大量的時間比價、排行程與確認細節。</p>
-                    <p>我的使命就是幫每位渴望探索世界的旅客，省去這些燒腦的繁瑣步驟。無論您想尋找極致性價比的清艙好康，還是尊榮無憂的客製化旅程，交給我，您只需負責收拾行李、帶著期待的心情輕鬆出發！</p>
-                </div>
+            <div>
+              <label style="font-size:11px;">到達時間</label>
+              <input type="time" id="depEndTime" oninput="autoSave()">
             </div>
+          </div>
+          <button class="btn-search-flight no-print" onclick="openGoogleFlightSearch('dep')">🔍 Google 查時間</button>
         </div>
-    </section>
+      </div>
 
-    <!-- 核心優勢 -->
-    <section id="advantages" class="advantages">
-        <div class="container">
-            <h2 class="section-title">為什麼選擇 LuLu？</h2>
-            <div class="adv-list">
-                <div class="adv-item">
-                    <div class="adv-num">01</div>
-                    <div class="adv-content">
-                        <h4>專業合法旅行社後盾</h4>
-                        <p>服務於專業資深的「找到了旅行社」，所有行程安全、合法、全面有保障，讓您出遊最安心。</p>
-                    </div>
-                </div>
-                <div class="adv-item">
-                    <div class="adv-num">02</div>
-                    <div class="adv-content">
-                        <h4>第一手好康特惠情報</h4>
-                        <p>即時鎖定市場上最新、最殺的清艙與早鳥優惠，第一時間分享到社群，幫您的旅費精打細算。</p>
-                    </div>
-                </div>
-                <div class="adv-item">
-                    <div class="adv-num">03</div>
-                    <div class="adv-content">
-                        <h4>一對一貼心諮詢服務</h4>
-                        <p>從出發前的簽證辦理、行程細節確認到旅途中的支援，提供最即時的專人回覆，不再擔心變孤兒。</p>
-                    </div>
-                </div>
+      <!-- 回程航班 -->
+      <div class="flight-row">
+        <span class="flight-tag return">回程航班</span>
+        <div class="flight-inputs-grid">
+          <div>
+            <label style="font-size:11px;">航空公司 / 班機號碼</label>
+            <input type="text" id="retFlightNo" placeholder="例如：BR384" oninput="autoMatchFlightTime('ret'); autoSave();">
+          </div>
+          <div class="time-inputs-row">
+            <div>
+              <label style="font-size:11px;">起飛時間</label>
+              <input type="time" id="retStartTime" oninput="autoSave()">
             </div>
-        </div>
-    </section>
-
-    <!-- CTA 行動呼籲 -->
-    <section id="contact" class="cta-section">
-        <div class="container">
-            <h2>別再猶豫了！下一趟精彩旅程，現在就開始</h2>
-            <p>立即加入我的 LINE 官方帳號，或直接來電，讓我成為您的專屬旅遊顧問。</p>
-            <a href="https://line.me/ti/p/~0907585858" class="btn btn-line" target="_blank">💚 立即加 LINE 諮詢 / 掌握最新出團情報</a>
-            <br>
-            <div class="contact-info">
-                <p>📞 旅程熱線：0907-585-858</p>
-                <p>🆔 LINE 搜尋：0907585858</p>
+            <div>
+              <label style="font-size:11px;">到達時間</label>
+              <input type="time" id="retEndTime" oninput="autoSave()">
             </div>
+          </div>
+          <button class="btn-search-flight no-print" onclick="openGoogleFlightSearch('ret')">🔍 Google 查時間</button>
         </div>
-    </section>
+      </div>
+    </div>
+  </div>
 
-    <!-- 頁尾 -->
-    <footer>
-        <p>&copy; 2026 旅遊規劃師 盧端祥 (LuLu) | 找到了旅行社. All Rights Reserved.</p>
-    </footer>
+  <!-- KLOOK 折扣碼橫幅 -->
+  <div class="pdf-promo-banner">
+    <div class="banner-text">
+      <span class="banner-badge">🔥 KLOOK 獨家優惠</span>
+      <span>結帳輸入折扣碼 <span class="promo-code-box">SHEEPLU</span> 享精選行程/網卡優惠！</span>
+    </div>
+    <button class="btn-copy-code no-print" onclick="copyCodeAndGo('SHEEPLU')">複製折扣碼前往 Klook ↗</button>
+  </div>
+
+  <!-- 步驟 2：每日路線規劃 -->
+  <div class="card">
+    <h2>🗺️ 2. 每日路線與探索花費</h2>
+    <div id="itineraryContainer">
+      <p style="color: #64748b; text-align: center; padding: 15px 0;">請先設定出發日期與天數，開始規劃行程...</p>
+    </div>
+  </div>
+
+  <!-- 步驟 3：預算估計與平台連結 -->
+  <div class="card">
+    <h2>💳 3. 預算試算與比價連結</h2>
+    
+    <!-- 參團人數設定列 -->
+    <div class="traveler-setting-row">
+      <label>👥 參團 / 出遊人數：</label>
+      <div class="traveler-input-wrapper">
+        <input type="number" id="travelerCount" value="2" min="1" oninput="calculateTotal(); autoSave();" style="font-weight: 800; text-align: center;">
+        <span style="font-size: 12px; font-weight: 700; color: #0369a1; white-space: nowrap;">人</span>
+      </div>
+    </div>
+
+    <div class="links-row-container no-print">
+      <div class="links-group">
+        <span class="links-group-title">✈️ 機票比價：</span>
+        <a href="https://www.skyscanner.com.tw/" target="_blank" class="btn-link btn-skyscanner">Skyscanner ↗</a>
+        <a href="https://tw.trip.com/" target="_blank" class="btn-link btn-trip">Trip.com ↗</a>
+      </div>
+
+      <div class="links-group">
+        <span class="links-group-title">🏨 訂房比價：</span>
+        <a href="https://www.agoda.com/zh-tw/" target="_blank" class="btn-link btn-agoda">Agoda ↗</a>
+        <a href="https://www.booking.com/index.zh-tw.html" target="_blank" class="btn-link btn-booking">Booking.com ↗</a>
+      </div>
+    </div>
+
+    <div class="budget-section">
+      <div class="budget-item">
+        <label>✈️ 機票總金額 (TWD/全體)</label>
+        <div class="cost-input-wrapper">
+          <input type="text" id="flightCost" value="0" oninput="calculateTotal(); autoSave();" placeholder="例如: 60000">
+        </div>
+        <span class="calc-preview" id="flightPreview">= 全體 $0 (共 2 人，每人 $0)</span>
+      </div>
+
+      <div class="budget-item">
+        <label>🏨 住宿總預估 (TWD)</label>
+        <div class="cost-input-wrapper">
+          <input type="text" id="hotelCost" value="0" oninput="calculateTotal(); autoSave();" placeholder="輸入訂房總價，如 12000">
+        </div>
+        <span class="calc-preview" id="hotelPreview">= $0 (平均每人 $0)</span>
+      </div>
+
+      <div class="budget-item">
+        <label>🎟️ 每日行程花費小計 (單人合計)</label>
+        <div class="cost-input-wrapper">
+          <input type="text" id="dailyCostSum" value="0" readonly style="background-color: #f1f5f9;">
+        </div>
+        <span class="calc-preview" id="dailyPreview">= 全體共 $0 (每人 $0)</span>
+      </div>
+    </div>
+
+    <!-- 總預算雙欄卡片 -->
+    <div class="total-price-card">
+      <div class="budget-split-row">
+        <!-- 左側：每人平均預算 -->
+        <div class="budget-col-left">
+          <div class="total-price-label">
+            <span>每人平均預算</span>
+            <span class="total-price-sublabel">PER PERSON BUDGET</span>
+          </div>
+          <div class="total-price-value">NT$ <span id="perPersonTotal">0</span></div>
+        </div>
+
+        <!-- 右側：全體總預算 -->
+        <div class="budget-col-right">
+          <div class="total-price-label" style="align-items: flex-end;">
+            <span>預估旅遊總預算</span>
+            <span class="total-price-sublabel">TOTAL ESTIMATED BUDGET</span>
+          </div>
+          <div class="total-price-value highlight-total">NT$ <span id="grandTotal">0</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- 頁尾體驗門票推薦與 Widget -->
+<div class="container no-print">
+  <div class="footer-ad-card">
+    <div class="footer-ad-title">🎁 KLOOK 專屬優惠（輸入優惠碼折扣）</div>
+    <div class="footer-ad-links">
+      <a href="https://www.klook.com/zh-TW/" target="_blank" class="btn-ad">🎟️ Klook 門票/網卡/包車專區 ↗ (優惠碼: <b>SHEEPLU</b>)</a>
+    </div>
+
+    <div class="klook-widget-wrapper">
+      <ins class="klk-aff-widget" data-wid="95097" data-adid="1355832" data-actids="131149,46604,2968" data-prod="mul_act" data-price="false" data-lang="" data-width="336" data-height="280" data-currency=""><a href="//www.klook.com/">Klook.com</a></ins>
+      <script type="text/javascript">
+        (function (d, sc, u) {
+          var s = d.createElement(sc),
+            p = d.getElementsByTagName(sc)[0];
+          s.type = "text/javascript";
+          s.async = true;
+          s.src = u;
+          p.parentNode.insertBefore(s, p);
+        })(
+          document,
+          "script",
+          "https://affiliate.klook.com/widget/fetch-iframe-init.js"
+        );
+      </script>
+    </div>
+  </div>
+</div>
+
+<!-- 螢幕最下方的滿版固定橫幅 -->
+<div class="sticky-bottom-banner no-print" id="stickyBanner">
+  <button class="banner-close-btn" onclick="closeStickyBanner()">✕</button>
+  <div class="banner-content">
+    <div class="banner-text">
+      <span class="banner-badge">🔥 KLOOK 優惠</span>
+      <span>結帳輸入 <span class="promo-code-box">SHEEPLU</span> 享優惠！</span>
+    </div>
+    <button class="btn-copy-code" onclick="copyCodeAndGo('SHEEPLU')">複製折扣碼前往 Klook ↗</button>
+  </div>
+</div>
+
+<script>
+  let currentDays = 0;
+
+  const flightDatabase = {
+    "BR383": { dep: "09:45", arr: "11:35" },
+    "BR384": { dep: "12:35", arr: "16:25" },
+    "BR198": { dep: "08:50", arr: "13:15" },
+    "BR197": { dep: "14:15", arr: "16:55" },
+    "BR192": { dep: "07:20", arr: "11:40" },
+    "BR191": { dep: "12:40", arr: "15:05" },
+    "CI100": { dep: "08:55", arr: "13:15" },
+    "CI101": { dep: "14:30", arr: "17:15" },
+    "JX800": { dep: "08:30", arr: "12:45" },
+    "JX801": { dep: "13:45", arr: "16:45" }
+  };
+
+  const weekDaysCN = ["星期日", "星期一", "星期二", "星期三", "星期四", "星期五", "星期六"];
+
+  window.addEventListener('DOMContentLoaded', () => {
+    loadFromLocalStorage();
+  });
+
+  function adjustInputWidth(input) {
+    const textLen = input.value.length || input.placeholder.length || 4;
+    const newWidth = Math.max(70, Math.min(180, textLen * 12 + 16));
+    input.style.width = newWidth + 'px';
+  }
+
+  function triggerConfetti() {
+    if (typeof confetti === 'function') {
+      confetti({
+        particleCount: 80,
+        spread: 70,
+        origin: { y: 0.6 }
+      });
+    }
+  }
+
+  function copyCodeAndGo(code) {
+    navigator.clipboard.writeText(code).then(() => {
+      alert(`優惠碼【${code}】已複製成功！即將前往 Klook 進行選購。`);
+      window.open('https://www.klook.com/zh-TW/', '_blank');
+    }).catch(() => {
+      window.open('https://www.klook.com/zh-TW/', '_blank');
+    });
+  }
+
+  function closeStickyBanner() {
+    const banner = document.getElementById('stickyBanner');
+    if (banner) banner.style.display = 'none';
+  }
+
+  function autoMatchFlightTime(type) {
+    const flightInput = document.getElementById(type === 'dep' ? 'depFlightNo' : 'retFlightNo');
+    const startInput = document.getElementById(type === 'dep' ? 'depStartTime' : 'retStartTime');
+    const endInput = document.getElementById(type === 'dep' ? 'depEndTime' : 'retEndTime');
+
+    const code = flightInput.value.toUpperCase().replace(/\s+/g, '');
+
+    if (flightDatabase[code]) {
+      startInput.value = flightDatabase[code].dep;
+      endInput.value = flightDatabase[code].arr;
+    }
+  }
+
+  function openGoogleFlightSearch(type) {
+    const flightInput = document.getElementById(type === 'dep' ? 'depFlightNo' : 'retFlightNo');
+    const flightNo = flightInput.value.trim();
+    if (flightNo) {
+      window.open(`https://www.google.com/search?q=${encodeURIComponent(flightNo + " 航班時間")}`, '_blank');
+    } else {
+      alert('請先輸入航班號碼（例如：BR383）');
+    }
+  }
+
+  function parseMathExpression(expr) {
+    if (!expr) return 0;
+    const sanitized = expr.toString().replace(/[^0-9+\-*/.]/g, '');
+    if (!sanitized) return 0;
+    try {
+      const result = new Function(`'use strict'; return (${sanitized})`)();
+      return isNaN(result) ? 0 : result;
+    } catch (e) {
+      return 0;
+    }
+  }
+
+  function onDateOrDaysChange(source) {
+    const startInput = document.getElementById('startDate');
+    const endInput = document.getElementById('endDate');
+    const daysInput = document.getElementById('travelDays');
+
+    const startVal = startInput.value;
+    const endVal = endInput.value;
+    const daysVal = parseInt(daysInput.value, 10);
+
+    if (source === 'days' && startVal && daysVal > 0) {
+      const start = new Date(startVal);
+      start.setDate(start.getDate() + (daysVal - 1));
+      endInput.value = formatDate(start);
+      currentDays = daysVal;
+      renderItineraryFields(currentDays);
+      calculateTotal();
+    } else if (source === 'start' && startVal && daysVal > 0) {
+      const start = new Date(startVal);
+      start.setDate(start.getDate() + (daysVal - 1));
+      endInput.value = formatDate(start);
+      currentDays = daysVal;
+      renderItineraryFields(currentDays);
+      calculateTotal();
+    } else if (startVal && endVal) {
+      const start = new Date(startVal);
+      const end = new Date(endVal);
+
+      const diffTime = end - start;
+      const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)) + 1;
+
+      if (diffDays > 0) {
+        daysInput.value = diffDays;
+        currentDays = diffDays;
+        renderItineraryFields(currentDays);
+        calculateTotal();
+      } else {
+        alert('回程日期必須晚於或等於出發日期！');
+        endInput.value = '';
+        daysInput.value = '';
+        currentDays = 0;
+        document.getElementById('itineraryContainer').innerHTML = '<p style="color: #64748b; text-align: center; padding: 15px 0;">請選擇有效的日期範圍...</p>';
+      }
+    } else {
+      renderItineraryFields(currentDays);
+    }
+  }
+
+  function formatDate(date) {
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+  }
+
+  function renderItineraryFields(count) {
+    const container = document.getElementById('itineraryContainer');
+    container.innerHTML = '';
+
+    const startDateVal = document.getElementById('startDate').value;
+    let startDateObj = startDateVal ? new Date(startDateVal) : null;
+
+    for (let i = 1; i <= count; i++) {
+      const isFirstDay = (i === 1);
+      const isLastDay = (i === count);
+
+      let dateStringTag = '';
+      if (startDateObj) {
+        const currentDate = new Date(startDateObj);
+        currentDate.setDate(startDateObj.getDate() + (i - 1));
+        const month = currentDate.getMonth() + 1;
+        const day = currentDate.getDate();
+        const weekDay = weekDaysCN[currentDate.getDay()];
+        dateStringTag = `<span class="day-date-tag">(${month}/${day} ${weekDay})</span>`;
+      }
+
+      const div = document.createElement('div');
+      div.className = 'day-box';
+      div.innerHTML = `
+        <h3>📍 DAY ${i} ${dateStringTag} 亮點行程與動線</h3>
+        <div class="input-row">
+          <div class="route-flow-container" id="route-flow-${i}">
+            <div class="route-chip-item">
+              ${isFirstDay ? `<span class="route-chip fixed">機場 ✈️</span><span class="arrow-icon">➡️</span>` : ''}
+              
+              <div class="route-chip">
+                <input type="text" placeholder="${isFirstDay ? '飯店 Check-in' : '地點'}" oninput="adjustInputWidth(this); autoSave();">
+              </div>
+            </div>
+
+            ${isLastDay ? `<div class="route-chip-item"><span class="arrow-icon">➡️</span><span class="route-chip fixed">機場 ✈️</span></div>` : ''}
+          </div>
+          <button class="btn-add-chip no-print" onclick="triggerConfetti(); addRouteChip(${i}, ${isLastDay});">＋ 新增地點</button>
+        </div>
+
+        <div class="input-row">
+          <label>當日單人花費估算 (支援計算式如 80+50+90)</label>
+          <div class="cost-input-wrapper">
+            <input type="text" class="day-cost-input" placeholder="例如：80+50+90" oninput="calculateTotal(); autoSave();">
+            <span class="calc-preview" id="day-calc-${i}">= 單人 $0</span>
+          </div>
+        </div>
+      `;
+      container.appendChild(div);
+
+      const inputs = div.querySelectorAll('.route-chip input[type="text"]');
+      inputs.forEach(input => adjustInputWidth(input));
+    }
+  }
+
+  function addRouteChip(dayIndex, isLastDay) {
+    const container = document.getElementById(`route-flow-${dayIndex}`);
+    const chipCount = container.querySelectorAll('.route-chip-item').length;
+    
+    const newChipItem = document.createElement('div');
+    newChipItem.className = 'route-chip-item';
+    
+    if (chipCount >= 1) {
+      newChipItem.classList.add('wrap-next-line');
+    }
+
+    newChipItem.innerHTML = `
+      <span class="arrow-icon">➡️</span>
+      <div class="route-chip">
+        <input type="text" placeholder="地點" oninput="adjustInputWidth(this); autoSave();">
+        <button class="btn-remove-chip no-print" onclick="removeRouteChip(this)">✕</button>
+      </div>
+    `;
+
+    if (isLastDay) {
+      const lastAirportItem = container.lastElementChild;
+      container.insertBefore(newChipItem, lastAirportItem);
+    } else {
+      container.appendChild(newChipItem);
+    }
+
+    const newInput = newChipItem.querySelector('input[type="text"]');
+    if (newInput) {
+      adjustInputWidth(newInput);
+      newInput.focus();
+    }
+    autoSave();
+  }
+
+  function removeRouteChip(button) {
+    const chipItem = button.closest('.route-chip-item');
+    chipItem.remove();
+    autoSave();
+  }
+
+  function calculateTotal() {
+    const travelerCount = parseInt(document.getElementById('travelerCount').value, 10) || 1;
+
+    // 1. 每日行程花費（單人加總 * 人數）
+    const dayCostInputs = document.querySelectorAll('.day-cost-input');
+    let dailyPerPersonSum = 0;
+
+    dayCostInputs.forEach((input, index) => {
+      const val = input.value.trim();
+      const calcResult = parseMathExpression(val);
+      dailyPerPersonSum += calcResult;
+
+      const previewSpan = document.getElementById(`day-calc-${index + 1}`);
+      if (previewSpan) {
+        previewSpan.innerText = `= 單人 $${calcResult.toLocaleString()}`;
+      }
+    });
+
+    const totalDailyCost = dailyPerPersonSum * travelerCount;
+    document.getElementById('dailyCostSum').value = totalDailyCost.toLocaleString();
+    document.getElementById('dailyPreview').innerText = `= 全體共 $${totalDailyCost.toLocaleString()} (每人 $${dailyPerPersonSum.toLocaleString()})`;
+
+    // 2. 機票總金額計算（總金額 ÷ 人數 = 每人機票）
+    const totalFlightCost = parseMathExpression(document.getElementById('flightCost').value);
+    const flightPerPerson = travelerCount > 0 ? Math.round(totalFlightCost / travelerCount) : 0;
+    document.getElementById('flightPreview').innerText = `= 全體 $${totalFlightCost.toLocaleString()} (共 ${travelerCount} 人，每人 $${flightPerPerson.toLocaleString()})`;
+
+    // 3. 住宿總預估（總價，計算每人平均分攤）
+    const hotelTotal = parseMathExpression(document.getElementById('hotelCost').value);
+    const nights = currentDays > 1 ? currentDays - 1 : 0;
+    const perPersonHotel = Math.round(hotelTotal / travelerCount);
+    
+    if (nights > 0 && hotelTotal > 0) {
+      const perNight = Math.round(hotelTotal / nights);
+      document.getElementById('hotelPreview').innerText = `= $${hotelTotal.toLocaleString()} (平均每人 $${perPersonHotel.toLocaleString()}，每晚 $${perNight.toLocaleString()})`;
+    } else {
+      document.getElementById('hotelPreview').innerText = `= $${hotelTotal.toLocaleString()} (平均每人 $${perPersonHotel.toLocaleString()})`;
+    }
+
+    // 4. 總預算與每人平均加總
+    const totalGrandCost = totalFlightCost + hotelTotal + totalDailyCost;
+    const perPersonGrandTotal = Math.round(totalGrandCost / travelerCount);
+
+    document.getElementById('grandTotal').innerText = totalGrandCost.toLocaleString();
+    document.getElementById('perPersonTotal').innerText = perPersonGrandTotal.toLocaleString();
+  }
+
+  function collectFormData() {
+    const daysData = [];
+    for (let i = 1; i <= currentDays; i++) {
+      const flowContainer = document.getElementById(`route-flow-${i}`);
+      const spots = [];
+      if (flowContainer) {
+        const inputs = flowContainer.querySelectorAll('input[type="text"]');
+        inputs.forEach(input => spots.push(input.value));
+      }
+      const costInput = document.querySelectorAll('.day-cost-input')[i - 1];
+      daysData.push({
+        spots: spots,
+        cost: costInput ? costInput.value : ''
+      });
+    }
+
+    return {
+      destination: document.getElementById('destination').value,
+      startDate: document.getElementById('startDate').value,
+      travelDays: document.getElementById('travelDays').value,
+      endDate: document.getElementById('endDate').value,
+      travelerCount: document.getElementById('travelerCount').value,
+      depFlightNo: document.getElementById('depFlightNo').value,
+      depStartTime: document.getElementById('depStartTime').value,
+      depEndTime: document.getElementById('depEndTime').value,
+      retFlightNo: document.getElementById('retFlightNo').value,
+      retStartTime: document.getElementById('retStartTime').value,
+      retEndTime: document.getElementById('retEndTime').value,
+      flightCost: document.getElementById('flightCost').value,
+      hotelCost: document.getElementById('hotelCost').value,
+      daysData: daysData
+    };
+  }
+
+  function autoSave() {
+    saveToLocalStorage(false);
+  }
+
+  function saveToLocalStorage(showAlert = false) {
+    const data = collectFormData();
+    localStorage.setItem('lulu_plan_draft', JSON.stringify(data));
+    if (showAlert) alert('💾 行程草稿已成功儲存！');
+  }
+
+  function loadFromLocalStorage() {
+    const saved = localStorage.getItem('lulu_plan_draft');
+    if (!saved) return;
+    try {
+      const data = JSON.parse(saved);
+      restoreFormData(data);
+    } catch (e) {
+      console.error(e);
+    }
+  }
+
+  function restoreFormData(data) {
+    if (data.destination !== undefined) document.getElementById('destination').value = data.destination;
+    if (data.startDate !== undefined) document.getElementById('startDate').value = data.startDate;
+    if (data.travelDays !== undefined) document.getElementById('travelDays').value = data.travelDays;
+    if (data.endDate !== undefined) document.getElementById('endDate').value = data.endDate;
+    if (data.travelerCount !== undefined) document.getElementById('travelerCount').value = data.travelerCount;
+    
+    if (data.depFlightNo !== undefined) document.getElementById('depFlightNo').value = data.depFlightNo;
+    if (data.depStartTime !== undefined) document.getElementById('depStartTime').value = data.depStartTime;
+    if (data.depEndTime !== undefined) document.getElementById('depEndTime').value = data.depEndTime;
+    
+    if (data.retFlightNo !== undefined) document.getElementById('retFlightNo').value = data.retFlightNo;
+    if (data.retStartTime !== undefined) document.getElementById('retStartTime').value = data.retStartTime;
+    if (data.retEndTime !== undefined) document.getElementById('retEndTime').value = data.retEndTime;
+
+    if (data.flightCost !== undefined) document.getElementById('flightCost').value = data.flightCost;
+    if (data.hotelCost !== undefined) document.getElementById('hotelCost').value = data.hotelCost;
+
+    const daysCount = parseInt(data.travelDays, 10);
+    if (daysCount > 0) {
+      currentDays = daysCount;
+      renderItineraryFields(currentDays);
+
+      if (data.daysData && Array.isArray(data.daysData)) {
+        data.daysData.forEach((dayInfo, i) => {
+          const dayIndex = i + 1;
+          const container = document.getElementById(`route-flow-${dayIndex}`);
+          if (container && dayInfo.spots) {
+            const isLastDay = (dayIndex === daysCount);
+            while (container.querySelectorAll('input[type="text"]').length < dayInfo.spots.length) {
+              addRouteChip(dayIndex, isLastDay);
+            }
+            const inputs = container.querySelectorAll('input[type="text"]');
+            dayInfo.spots.forEach((spotText, sIdx) => {
+              if (inputs[sIdx]) {
+                inputs[sIdx].value = spotText;
+                adjustInputWidth(inputs[sIdx]);
+              }
+            });
+          }
+          const costInputs = document.querySelectorAll('.day-cost-input');
+          if (costInputs[i] && dayInfo.cost !== undefined) {
+            costInputs[i].value = dayInfo.cost;
+          }
+        });
+      }
+    }
+    calculateTotal();
+  }
+
+  function clearDraft() {
+    if (confirm('確定要清空內容嗎？')) {
+      localStorage.removeItem('lulu_plan_draft');
+      location.reload();
+    }
+  }
+
+  function exportJSON() {
+    const data = collectFormData();
+    const destName = data.destination.trim() || '旅遊行程';
+    const jsonStr = JSON.stringify(data, null, 2);
+    const blob = new Blob([jsonStr], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `${destName}_專案檔.json`;
+    a.click();
+    URL.revokeObjectURL(url);
+  }
+
+  function importJSON(event) {
+    const file = event.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = function(e) {
+      try {
+        const data = JSON.parse(e.target.result);
+        restoreFormData(data);
+        autoSave();
+        alert('📂 行程專案檔已成功匯入！');
+      } catch (err) {
+        alert('匯入失敗：檔案格式不正確。');
+      }
+    };
+    reader.readAsText(file);
+  }
+
+  function exportToPDF() {
+    document.body.classList.add('hide-ui-for-pdf');
+
+    const element = document.getElementById('pdfContent');
+    const destName = document.getElementById('destination').value.trim() || '旅遊行程';
+    
+    const opt = {
+      margin:       [10, 8, 10, 8],
+      filename:     `${destName}_手冊企劃書.pdf`,
+      image:        { type: 'jpeg', quality: 0.98 },
+      html2canvas:  { scale: 2, useCORS: true, logging: false },
+      jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' },
+      pagebreak:    { mode: ['avoid-all', 'css', 'legacy'] }
+    };
+
+    html2pdf().set(opt).from(element).save().then(() => {
+      document.body.classList.remove('hide-ui-for-pdf');
+    }).catch(() => {
+      document.body.classList.remove('hide-ui-for-pdf');
+    });
+  }
+</script>
 
 </body>
 </html>
