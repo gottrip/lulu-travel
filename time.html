@@ -1,0 +1,501 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>三時段同步服藥倒數計時器</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "PingFang TC", sans-serif;
+        }
+        body {
+            background-color: #0f172a;
+            color: #f8fafc;
+            min-height: 100vh;
+            padding: 24px 16px;
+            display: flex;
+            justify-content: center;
+        }
+        .container {
+            width: 100%;
+            max-width: 900px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+        .header {
+            text-align: center;
+        }
+        .header h1 {
+            font-size: 24px;
+            font-weight: 800;
+            color: #f1f5f9;
+        }
+        .header p {
+            font-size: 13px;
+            color: #94a3b8;
+            margin-top: 4px;
+        }
+        .share-banner {
+            display: none;
+            background: rgba(34, 197, 94, 0.15);
+            border: 1px solid #22c55e;
+            color: #86efac;
+            padding: 10px 14px;
+            border-radius: 12px;
+            font-size: 13px;
+            text-align: center;
+        }
+        .control-panel {
+            background: #1e293b;
+            border-radius: 16px;
+            padding: 18px 20px;
+            border: 1px solid #334155;
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+        }
+        .input-row {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 10px;
+        }
+        .input-label {
+            font-size: 14px;
+            font-weight: 600;
+            color: #cbd5e1;
+        }
+        input[type="text"] {
+            background-color: #0f172a;
+            border: 1px solid #334155;
+            color: #38bdf8;
+            padding: 8px 12px;
+            border-radius: 8px;
+            font-size: 15px;
+            font-weight: 600;
+            font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+            outline: none;
+            width: 160px;
+        }
+        input[type="text"]:focus {
+            border-color: #38bdf8;
+        }
+        .hint-text {
+            font-size: 12px;
+            color: #64748b;
+        }
+        .btn-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        button {
+            border: none;
+            border-radius: 10px;
+            font-size: 14px;
+            font-weight: 600;
+            padding: 10px 18px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        button:active { transform: scale(0.97); }
+        .btn-primary { background: #2563eb; color: #fff; }
+        .btn-primary:hover { background: #1d4ed8; }
+        .btn-secondary { background: #0284c7; color: #fff; }
+        .btn-secondary:hover { background: #0369a1; }
+        .btn-share { background: #10b981; color: #fff; }
+        .btn-share:hover { background: #059669; }
+        .btn-reset { background: #334155; color: #cbd5e1; }
+        .btn-reset:hover { background: #475569; }
+
+        /* 卡片網格 */
+        .cards-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            gap: 16px;
+        }
+        .plan-card {
+            background: #1e293b;
+            border-radius: 16px;
+            padding: 18px;
+            border: 1px solid #334155;
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+        }
+        .plan-header {
+            border-bottom: 1px solid #334155;
+            padding-bottom: 10px;
+        }
+        .plan-title {
+            font-size: 16px;
+            font-weight: 700;
+            color: #f1f5f9;
+        }
+        .plan-subtitle {
+            font-size: 12px;
+            color: #94a3b8;
+            margin-top: 2px;
+        }
+        .timer-box {
+            background: #0f172a;
+            border-radius: 12px;
+            padding: 14px;
+            text-align: center;
+            border: 1px solid #334155;
+        }
+        .timer-label {
+            font-size: 11px;
+            color: #94a3b8;
+            text-transform: uppercase;
+        }
+        .timer-display {
+            font-size: 32px;
+            font-weight: 800;
+            font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+            color: #38bdf8;
+            letter-spacing: 0.5px;
+            margin: 4px 0;
+        }
+        .next-target {
+            font-size: 12px;
+            color: #cbd5e1;
+        }
+        .doses-list {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+        .dose-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: #0f172a;
+            padding: 8px 10px;
+            border-radius: 8px;
+            font-size: 12px;
+            border: 1px solid #334155;
+        }
+        .dose-row.done {
+            border-color: #16a34a;
+            color: #86efac;
+            background: rgba(22, 163, 74, 0.08);
+        }
+        .dose-row.current {
+            border-color: #38bdf8;
+            background: rgba(56, 189, 248, 0.08);
+        }
+        .badge {
+            font-size: 10px;
+            padding: 2px 6px;
+            border-radius: 4px;
+            background: #334155;
+            color: #94a3b8;
+        }
+        .dose-row.done .badge { background: #16a34a; color: #dcfce7; }
+        .dose-row.current .badge { background: #0284c7; color: #e0f2fe; }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <div class="header">
+            <h1>💊 三時段同步服藥倒數計時</h1>
+            <p>鍵盤直接打字輸入第一次服藥時間，同步計算全天用藥排程</p>
+        </div>
+
+        <div id="shareBanner" class="share-banner">
+            🔗 已成功從共享連結載入服藥時程！
+        </div>
+
+        <div class="control-panel">
+            <div class="input-row">
+                <label class="input-label" for="timeTextInput">第一次服藥時間：</label>
+                <input type="text" id="timeTextInput" placeholder="例如 14:30 或 08:00">
+                <button type="button" class="btn-primary" id="btnStart">⚡ 開始計時</button>
+                <span class="hint-text">(支援直接打字，例：14:30、0900、2026/08/31 14:30)</span>
+            </div>
+            <div class="btn-group">
+                <button type="button" class="btn-secondary" id="btnFillNow">填入現在時間</button>
+                <button type="button" class="btn-share" id="btnShare">🔗 複製分享連結給第二人</button>
+                <button type="button" class="btn-reset" id="btnReset">重設</button>
+            </div>
+        </div>
+
+        <div class="cards-grid">
+            
+            <div class="plan-card" id="cardA">
+                <div class="plan-header">
+                    <div class="plan-title">方案 A：一天 2 次</div>
+                    <div class="plan-subtitle">間隔 8 小時（共 2 劑）</div>
+                </div>
+                <div class="timer-box">
+                    <div class="timer-label" id="labelA">距離下一劑</div>
+                    <div class="timer-display" id="timerA">00:00:00</div>
+                    <div class="next-target" id="targetA">預計時間：--:--</div>
+                </div>
+                <div class="doses-list" id="listA">
+                    <div class="dose-row"><span>第 1 劑</span><span class="badge">等待中</span></div>
+                    <div class="dose-row"><span>第 2 劑</span><span class="badge">等待中</span></div>
+                </div>
+            </div>
+
+            <div class="plan-card" id="cardB">
+                <div class="plan-header">
+                    <div class="plan-title">方案 B：一天 3 次</div>
+                    <div class="plan-subtitle">間隔 4 小時（共 3 劑）</div>
+                </div>
+                <div class="timer-box">
+                    <div class="timer-label" id="labelB">距離下一劑</div>
+                    <div class="timer-display" id="timerB">00:00:00</div>
+                    <div class="next-target" id="targetB">預計時間：--:--</div>
+                </div>
+                <div class="doses-list" id="listB">
+                    <div class="dose-row"><span>第 1 劑</span><span class="badge">等待中</span></div>
+                    <div class="dose-row"><span>第 2 劑</span><span class="badge">等待中</span></div>
+                    <div class="dose-row"><span>第 3 劑</span><span class="badge">等待中</span></div>
+                </div>
+            </div>
+
+            <div class="plan-card" id="cardC">
+                <div class="plan-header">
+                    <div class="plan-title">方案 C：一天 4 次</div>
+                    <div class="plan-subtitle">間隔 4 小時（共 4 劑）</div>
+                </div>
+                <div class="timer-box">
+                    <div class="timer-label" id="labelC">距離下一劑</div>
+                    <div class="timer-display" id="timerC">00:00:00</div>
+                    <div class="next-target" id="targetC">預計時間：--:--</div>
+                </div>
+                <div class="doses-list" id="listC">
+                    <div class="dose-row"><span>第 1 劑</span><span class="badge">等待中</span></div>
+                    <div class="dose-row"><span>第 2 劑</span><span class="badge">等待中</span></div>
+                    <div class="dose-row"><span>第 3 劑</span><span class="badge">等待中</span></div>
+                    <div class="dose-row"><span>第 4 劑</span><span class="badge">等待中</span></div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <script>
+        var baseStartTime = null;
+        var intervalHandle = null;
+
+        var plans = {
+            'A': { totalDoses: 2, intervalHours: 8 },
+            'B': { totalDoses: 3, intervalHours: 4 },
+            'C': { totalDoses: 4, intervalHours: 4 }
+        };
+
+        function pad(n) { return n < 10 ? '0' + n : '' + n; }
+
+        function formatHM(date) {
+            return pad(date.getHours()) + ':' + pad(date.getMinutes());
+        }
+
+        function formatHMS(sec) {
+            if (sec <= 0) return "00:00:00";
+            var h = Math.floor(sec / 3600);
+            var m = Math.floor((sec % 3600) / 60);
+            var s = sec % 60;
+            return pad(h) + ':' + pad(m) + ':' + pad(s);
+        }
+
+        function parseTypedTime(str) {
+            if (!str) return null;
+            str = str.trim();
+            var now = new Date();
+
+            // 1. 純數字 (如 930, 1430)
+            if (/^\d{3,4}$/.test(str)) {
+                var padded = str.length === 3 ? '0' + str : str;
+                var h = parseInt(padded.slice(0, 2), 10);
+                var m = parseInt(padded.slice(2, 4), 10);
+                if (h >= 0 && h < 24 && m >= 0 && m < 60) {
+                    return new Date(now.getFullYear(), now.getMonth(), now.getDate(), h, m, 0).getTime();
+                }
+            }
+
+            // 2. HH:MM 或 H:MM
+            var timeMatch = str.match(/^(\d{1,2}):(\d{1,2})$/);
+            if (timeMatch) {
+                var h = parseInt(timeMatch[1], 10);
+                var m = parseInt(timeMatch[2], 10);
+                if (h >= 0 && h < 24 && m >= 0 && m < 60) {
+                    return new Date(now.getFullYear(), now.getMonth(), now.getDate(), h, m, 0).getTime();
+                }
+            }
+
+            // 3. 日期 + 時間 (如 2026/08/31 14:30 或 08/31 14:30)
+            var fullMatch = str.match(/^(?:(\d{4})[\/\-])?(\d{1,2})[\/\-](\d{1,2})\s+(\d{1,2}):(\d{1,2})$/);
+            if (fullMatch) {
+                var year = fullMatch[1] ? parseInt(fullMatch[1], 10) : now.getFullYear();
+                var month = parseInt(fullMatch[2], 10) - 1;
+                var date = parseInt(fullMatch[3], 10);
+                var h = parseInt(fullMatch[4], 10);
+                var m = parseInt(fullMatch[5], 10);
+                var d = new Date(year, month, date, h, m, 0);
+                if (!isNaN(d.getTime())) return d.getTime();
+            }
+
+            var direct = new Date(str);
+            if (!isNaN(direct.getTime())) return direct.getTime();
+
+            return null;
+        }
+
+        function updateAll() {
+            if (!baseStartTime) return;
+            var now = Date.now();
+
+            ['A', 'B', 'C'].forEach(function(key) {
+                var plan = plans[key];
+                var schedule = [];
+
+                for (var i = 0; i < plan.totalDoses; i++) {
+                    schedule.push(baseStartTime + (i * plan.intervalHours * 3600 * 1000));
+                }
+
+                var nextDoseIdx = -1;
+                for (var i = 0; i < schedule.length; i++) {
+                    if (schedule[i] > now) {
+                        nextDoseIdx = i;
+                        break;
+                    }
+                }
+
+                var timerEl = document.getElementById('timer' + key);
+                var targetEl = document.getElementById('target' + key);
+                var labelEl = document.getElementById('label' + key);
+
+                if (nextDoseIdx === -1) {
+                    timerEl.textContent = "00:00:00";
+                    timerEl.style.color = "#22c55e";
+                    if (labelEl) labelEl.textContent = "狀態";
+                    targetEl.textContent = "🎉 今日療程全數完成";
+                } else {
+                    var remainSec = Math.floor((schedule[nextDoseIdx] - now) / 1000);
+                    timerEl.textContent = formatHMS(remainSec);
+                    timerEl.style.color = "#38bdf8";
+                    if (labelEl) labelEl.textContent = "距離第 " + (nextDoseIdx + 1) + " 劑";
+                    targetEl.textContent = "預計時間：" + formatHM(new Date(schedule[nextDoseIdx]));
+                }
+
+                var listHtml = '';
+                for (var i = 0; i < schedule.length; i++) {
+                    var doseTime = schedule[i];
+                    var timeStr = formatHM(new Date(doseTime));
+                    var rowClass = '';
+                    var badgeText = '等待中';
+
+                    if (doseTime <= now) {
+                        rowClass = 'done';
+                        badgeText = '已到時間';
+                    } else if (i === nextDoseIdx) {
+                        rowClass = 'current';
+                        badgeText = '倒數中';
+                    }
+
+                    listHtml += '<div class="dose-row ' + rowClass + '">' +
+                        '<span><strong>第 ' + (i + 1) + ' 劑</strong> (' + timeStr + ')</span>' +
+                        '<span class="badge">' + badgeText + '</span>' +
+                    '</div>';
+                }
+                document.getElementById('list' + key).innerHTML = listHtml;
+            });
+        }
+
+        function startTimerFromTimestamp(ts) {
+            baseStartTime = ts;
+            document.getElementById('timeTextInput').value = formatHM(new Date(ts));
+            window.location.hash = 't=' + ts;
+
+            if (intervalHandle) clearInterval(intervalHandle);
+            updateAll();
+            intervalHandle = setInterval(updateAll, 1000);
+        }
+
+        // 開始計時按鈕
+        document.getElementById('btnStart').onclick = function() {
+            var rawText = document.getElementById('timeTextInput').value;
+            var parsedTs = parseTypedTime(rawText);
+
+            if (!parsedTs) {
+                alert('時間格式無法辨識！請直接輸入如「14:30」、「08:00」或點擊「填入現在時間」。');
+                return;
+            }
+
+            startTimerFromTimestamp(parsedTs);
+        };
+
+        // 填入現在時間按鈕
+        document.getElementById('btnFillNow').onclick = function() {
+            document.getElementById('timeTextInput').value = formatHM(new Date());
+        };
+
+        // 支援在輸入框按下 Enter 直接開始
+        document.getElementById('timeTextInput').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                document.getElementById('btnStart').click();
+            }
+        });
+
+        // 複製分享連結
+        document.getElementById('btnShare').onclick = function() {
+            if (!baseStartTime) {
+                alert('請先輸入時間並點擊「開始計時」後再分享！');
+                return;
+            }
+            var shareUrl = window.location.origin + window.location.pathname + '#t=' + baseStartTime;
+            navigator.clipboard.writeText(shareUrl).then(function() {
+                alert('已複製共享連結！傳給第二人打開即可同步觀看倒數：\n' + shareUrl);
+            }).catch(function() {
+                prompt('請手動複製下方共享連結：', shareUrl);
+            });
+        };
+
+        // 重設
+        document.getElementById('btnReset').onclick = function() {
+            if (intervalHandle) clearInterval(intervalHandle);
+            intervalHandle = null;
+            baseStartTime = null;
+            window.location.hash = '';
+
+            ['A', 'B', 'C'].forEach(function(key) {
+                var timerEl = document.getElementById('timer' + key);
+                timerEl.textContent = "00:00:00";
+                timerEl.style.color = "#38bdf8";
+                document.getElementById('target' + key).textContent = "預計時間：--:--";
+                document.getElementById('label' + key).textContent = "距離下一劑";
+                
+                var plan = plans[key];
+                var html = '';
+                for (var i = 0; i < plan.totalDoses; i++) {
+                    html += '<div class="dose-row"><span>第 ' + (i + 1) + ' 劑</span><span class="badge">等待中</span></div>';
+                }
+                document.getElementById('list' + key).innerHTML = html;
+            });
+            document.getElementById('shareBanner').style.display = 'none';
+        };
+
+        // 頁面載入
+        window.addEventListener('DOMContentLoaded', function() {
+            var hash = window.location.hash;
+            if (hash && hash.indexOf('t=') !== -1) {
+                var ts = parseInt(hash.split('t=')[1]);
+                if (!isNaN(ts)) {
+                    document.getElementById('shareBanner').style.display = 'block';
+                    startTimerFromTimestamp(ts);
+                    return;
+                }
+            }
+            document.getElementById('timeTextInput').value = formatHM(new Date());
+        });
+    </script>
+</body>
+</html>
