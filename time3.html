@@ -1,0 +1,446 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>服藥倒數計時器</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "PingFang TC", sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
+        body {
+            background-color: #0b1329;
+            color: #f8fafc;
+            height: 100dvh;
+            max-height: 100dvh;
+            padding: 6px 10px calc(env(safe-area-inset-bottom) + 6px) 10px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            overflow: hidden;
+        }
+        .app-header {
+            text-align: center;
+            padding: 1px 0;
+        }
+        .app-header h1 {
+            font-size: 16px;
+            font-weight: 800;
+            color: #f8fafc;
+        }
+        .control-box {
+            background: #18233c;
+            border-radius: 12px;
+            padding: 8px 10px;
+            border: 1px solid #334155;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+        .input-row {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .input-row label {
+            font-size: 13px;
+            font-weight: 700;
+            color: #e2e8f0;
+            white-space: nowrap;
+        }
+        input[type="text"] {
+            background-color: #0b1329;
+            border: 1.5px solid #38bdf8;
+            color: #38bdf8;
+            padding: 5px 8px;
+            border-radius: 8px;
+            font-size: 17px;
+            font-weight: 800;
+            font-family: ui-monospace, monospace;
+            width: 85px;
+            text-align: center;
+            outline: none;
+        }
+        .btn-row {
+            display: flex;
+            gap: 5px;
+        }
+        button {
+            border: none;
+            border-radius: 8px;
+            font-size: 12px;
+            font-weight: 700;
+            padding: 6px 6px;
+            cursor: pointer;
+            white-space: nowrap;
+            transition: opacity 0.15s;
+        }
+        button:active { opacity: 0.7; }
+        .btn-start { background: #2563eb; color: #fff; flex: 1.1; font-size: 13px; }
+        .btn-now { background: #0284c7; color: #fff; flex: 0.9; }
+        .btn-alarm { background: #f59e0b; color: #000; flex: 1.4; font-weight: 800; }
+        .btn-share { background: #10b981; color: #fff; flex: 1; }
+        .btn-reset { background: #334155; color: #cbd5e1; flex: 0.6; }
+
+        .cards-list {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            flex: 1;
+            justify-content: space-between;
+            margin: 4px 0 0 0;
+        }
+        .plan-card {
+            background: #18233c;
+            border-radius: 12px;
+            padding: 8px 10px;
+            border: 1px solid #334155;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            flex: 1;
+        }
+        .card-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .plan-title {
+            font-size: 14px;
+            font-weight: 800;
+            color: #f8fafc;
+        }
+        .plan-tag {
+            font-size: 12px;
+            font-weight: 600;
+            color: #94a3b8;
+        }
+        .card-mid {
+            display: flex;
+            align-items: flex-end;
+            justify-content: space-between;
+            margin: 1px 0;
+        }
+        .timer-val {
+            font-size: 30px;
+            font-weight: 900;
+            font-family: ui-monospace, monospace;
+            color: #38bdf8;
+            line-height: 1;
+            letter-spacing: 0.5px;
+        }
+        .target-val {
+            font-size: 13px;
+            color: #e2e8f0;
+            font-weight: 700;
+        }
+        .card-doses {
+            display: flex;
+            gap: 5px;
+        }
+        .dose-pill {
+            flex: 1;
+            background: #0b1329;
+            border: 1.5px solid #334155;
+            padding: 5px 6px;
+            border-radius: 7px;
+            font-size: 14px;
+            font-weight: 800;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-family: ui-monospace, monospace;
+        }
+        .dose-pill span:first-child { font-size: 13px; font-weight: 800; }
+        .dose-pill.done {
+            border-color: #16a34a;
+            background: rgba(22, 163, 74, 0.2);
+            color: #86efac;
+        }
+        .dose-pill.current {
+            border-color: #38bdf8;
+            background: rgba(56, 189, 248, 0.2);
+            color: #38bdf8;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="app-header">
+        <h1>💊 服藥同步倒數計時</h1>
+    </div>
+
+    <div class="control-box">
+        <div class="input-row">
+            <label for="timeTextInput">第一次服藥：</label>
+            <input type="text" id="timeTextInput" placeholder="11:00">
+            <button type="button" class="btn-start" id="btnStart">⚡ 開始計時</button>
+            <button type="button" class="btn-now" id="btnFillNow">填入現在</button>
+        </div>
+        <div class="btn-row">
+            <button type="button" class="btn-alarm" id="btnExportAlarms">⏰ 一鍵加入4個鬧鐘</button>
+            <button type="button" class="btn-share" id="btnShare">🔗 分享連結</button>
+            <button type="button" class="btn-reset" id="btnReset">重設</button>
+        </div>
+    </div>
+
+    <div class="cards-list">
+        
+        <div class="plan-card" id="cardA">
+            <div class="card-top">
+                <span class="plan-title">方案 A：一天 2 次</span>
+                <span class="plan-tag">間隔 8 小時</span>
+            </div>
+            <div class="card-mid">
+                <span class="timer-val" id="timerA">00:00:00</span>
+                <span class="target-val" id="targetA">預計：--:--</span>
+            </div>
+            <div class="card-doses" id="listA">
+                <div class="dose-pill"><span>1劑</span><span>--:--</span></div>
+                <div class="dose-pill"><span>2劑</span><span>--:--</span></div>
+            </div>
+        </div>
+
+        <div class="plan-card" id="cardB">
+            <div class="card-top">
+                <span class="plan-title">方案 B：一天 3 次</span>
+                <span class="plan-tag">間隔 4 小時</span>
+            </div>
+            <div class="card-mid">
+                <span class="timer-val" id="timerB">00:00:00</span>
+                <span class="target-val" id="targetB">預計：--:--</span>
+            </div>
+            <div class="card-doses" id="listB">
+                <div class="dose-pill"><span>1劑</span><span>--:--</span></div>
+                <div class="dose-pill"><span>2劑</span><span>--:--</span></div>
+                <div class="dose-pill"><span>3劑</span><span>--:--</span></div>
+            </div>
+        </div>
+
+        <div class="plan-card" id="cardC">
+            <div class="card-top">
+                <span class="plan-title">方案 C：一天 4 次</span>
+                <span class="plan-tag">間隔 4 小時</span>
+            </div>
+            <div class="card-mid">
+                <span class="timer-val" id="timerC">00:00:00</span>
+                <span class="target-val" id="targetC">預計：--:--</span>
+            </div>
+            <div class="card-doses" id="listC">
+                <div class="dose-pill"><span>1劑</span><span>--:--</span></div>
+                <div class="dose-pill"><span>2劑</span><span>--:--</span></div>
+                <div class="dose-pill"><span>3劑</span><span>--:--</span></div>
+                <div class="dose-pill"><span>4劑</span><span>--:--</span></div>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        var baseStartTime = null;
+        var intervalHandle = null;
+
+        var plans = {
+            'A': { totalDoses: 2, intervalHours: 8 },
+            'B': { totalDoses: 3, intervalHours: 4 },
+            'C': { totalDoses: 4, intervalHours: 4 }
+        };
+
+        function pad(n) { return n < 10 ? '0' + n : '' + n; }
+
+        function formatHM(date) {
+            return pad(date.getHours()) + ':' + pad(date.getMinutes());
+        }
+
+        function formatHMS(sec) {
+            if (sec <= 0) return "00:00:00";
+            var h = Math.floor(sec / 3600);
+            var m = Math.floor((sec % 3600) / 60);
+            var s = sec % 60;
+            return pad(h) + ':' + pad(m) + ':' + pad(s);
+        }
+
+        function parseTypedTime(str) {
+            if (!str) return null;
+            str = str.trim();
+            var now = new Date();
+
+            if (/^\d{3,4}$/.test(str)) {
+                var padded = str.length === 3 ? '0' + str : str;
+                var h = parseInt(padded.slice(0, 2), 10);
+                var m = parseInt(padded.slice(2, 4), 10);
+                if (h >= 0 && h < 24 && m >= 0 && m < 60) {
+                    return new Date(now.getFullYear(), now.getMonth(), now.getDate(), h, m, 0).getTime();
+                }
+            }
+
+            var timeMatch = str.match(/^(\d{1,2}):(\d{1,2})$/);
+            if (timeMatch) {
+                var h = parseInt(timeMatch[1], 10);
+                var m = parseInt(timeMatch[2], 10);
+                if (h >= 0 && h < 24 && m >= 0 && m < 60) {
+                    return new Date(now.getFullYear(), now.getMonth(), now.getDate(), h, m, 0).getTime();
+                }
+            }
+
+            var direct = new Date(str);
+            if (!isNaN(direct.getTime())) return direct.getTime();
+
+            return null;
+        }
+
+        function updateAll() {
+            if (!baseStartTime) return;
+            var now = Date.now();
+
+            ['A', 'B', 'C'].forEach(function(key) {
+                var plan = plans[key];
+                var schedule = [];
+
+                for (var i = 0; i < plan.totalDoses; i++) {
+                    schedule.push(baseStartTime + (i * plan.intervalHours * 3600 * 1000));
+                }
+
+                var nextDoseIdx = -1;
+                for (var i = 0; i < schedule.length; i++) {
+                    if (schedule[i] > now) {
+                        nextDoseIdx = i;
+                        break;
+                    }
+                }
+
+                var timerEl = document.getElementById('timer' + key);
+                var targetEl = document.getElementById('target' + key);
+
+                if (nextDoseIdx === -1) {
+                    timerEl.textContent = "00:00:00";
+                    timerEl.style.color = "#22c55e";
+                    targetEl.textContent = "✅ 全部完成";
+                } else {
+                    var remainSec = Math.floor((schedule[nextDoseIdx] - now) / 1000);
+                    timerEl.textContent = formatHMS(remainSec);
+                    timerEl.style.color = "#38bdf8";
+                    targetEl.textContent = "第" + (nextDoseIdx + 1) + "劑 " + formatHM(new Date(schedule[nextDoseIdx]));
+                }
+
+                var listHtml = '';
+                for (var i = 0; i < schedule.length; i++) {
+                    var doseTime = schedule[i];
+                    var timeStr = formatHM(new Date(doseTime));
+                    var cls = '';
+
+                    if (doseTime <= now) {
+                        cls = 'done';
+                    } else if (i === nextDoseIdx) {
+                        cls = 'current';
+                    }
+
+                    listHtml += '<div class="dose-pill ' + cls + '">' +
+                        '<span>' + (i + 1) + '劑</span>' +
+                        '<span>' + timeStr + '</span>' +
+                    '</div>';
+                }
+                document.getElementById('list' + key).innerHTML = listHtml;
+            });
+        }
+
+        function startTimerFromTimestamp(ts) {
+            baseStartTime = ts;
+            document.getElementById('timeTextInput').value = formatHM(new Date(ts));
+            window.location.hash = 't=' + ts;
+
+            if (intervalHandle) clearInterval(intervalHandle);
+            updateAll();
+            intervalHandle = setInterval(updateAll, 1000);
+        }
+
+        document.getElementById('btnStart').onclick = function() {
+            var rawText = document.getElementById('timeTextInput').value;
+            var parsedTs = parseTypedTime(rawText);
+            if (!parsedTs) {
+                alert('時間格式無法辨識，請輸入如 11:00');
+                return;
+            }
+            startTimerFromTimestamp(parsedTs);
+        };
+
+        document.getElementById('btnFillNow').onclick = function() {
+            document.getElementById('timeTextInput').value = formatHM(new Date());
+        };
+
+        // 一鍵將 4 個劑次時間寫入剪貼簿並觸發 iOS 捷徑加入鬧鐘
+        document.getElementById('btnExportAlarms').onclick = function() {
+            if (!baseStartTime) {
+                alert('請先輸入時間並點擊「開始計時」！');
+                return;
+            }
+
+            // 產生方案 C 的 4 個劑次時間 (4 小時間隔)
+            var alarmTimes = [];
+            for (var i = 0; i < 4; i++) {
+                var doseTime = new Date(baseStartTime + (i * 4 * 3600 * 1000));
+                alarmTimes.push(formatHM(doseTime));
+            }
+
+            var textPayload = alarmTimes.join('\n');
+            
+            navigator.clipboard.writeText(textPayload).then(function() {
+                // 自動喚醒名為 MedAlarms 的 iOS 捷徑
+                window.location.href = 'shortcuts://run-shortcut?name=MedAlarms';
+            }).catch(function() {
+                window.location.href = 'shortcuts://run-shortcut?name=MedAlarms';
+            });
+        };
+
+        document.getElementById('btnShare').onclick = function() {
+            if (!baseStartTime) {
+                alert('請先點擊「開始計時」');
+                return;
+            }
+            var shareUrl = window.location.origin + window.location.pathname + '#t=' + baseStartTime;
+            navigator.clipboard.writeText(shareUrl).then(function() {
+                alert('已複製共享連結！');
+            }).catch(function() {
+                prompt('請複製下方共享連結：', shareUrl);
+            });
+        };
+
+        document.getElementById('btnReset').onclick = function() {
+            if (intervalHandle) clearInterval(intervalHandle);
+            intervalHandle = null;
+            baseStartTime = null;
+            window.location.hash = '';
+
+            ['A', 'B', 'C'].forEach(function(key) {
+                var timerEl = document.getElementById('timer' + key);
+                timerEl.textContent = "00:00:00";
+                timerEl.style.color = "#38bdf8";
+                document.getElementById('target' + key).textContent = "預計：--:--";
+                
+                var plan = plans[key];
+                var html = '';
+                for (var i = 0; i < plan.totalDoses; i++) {
+                    html += '<div class="dose-pill"><span>' + (i + 1) + '劑</span><span>--:--</span></div>';
+                }
+                document.getElementById('list' + key).innerHTML = html;
+            });
+        };
+
+        window.addEventListener('DOMContentLoaded', function() {
+            var hash = window.location.hash;
+            if (hash && hash.indexOf('t=') !== -1) {
+                var ts = parseInt(hash.split('t=')[1]);
+                if (!isNaN(ts)) {
+                    startTimerFromTimestamp(ts);
+                    return;
+                }
+            }
+            document.getElementById('timeTextInput').value = formatHM(new Date());
+        });
+    </script>
+</body>
+</html>
