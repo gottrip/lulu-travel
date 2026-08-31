@@ -2,7 +2,7 @@
 <html lang="zh-TW">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>服藥倒數計時器</title>
     <style>
         * {
@@ -13,39 +13,33 @@
             -webkit-tap-highlight-color: transparent;
         }
         body {
-            background-color: #0f172a;
+            background-color: #0b1329;
             color: #f8fafc;
-            height: 100vh;
-            max-height: 100vh;
-            padding: 8px 12px;
+            height: 100dvh;
+            max-height: 100dvh;
+            padding: 8px 12px calc(env(safe-area-inset-bottom) + 8px) 12px;
             display: flex;
             flex-direction: column;
             justify-content: space-between;
             overflow: hidden;
         }
+        
+        /* 標題 */
         .app-header {
             text-align: center;
-            padding: 2px 0 4px 0;
+            padding: 2px 0;
         }
         .app-header h1 {
-            font-size: 16px;
+            font-size: 18px;
             font-weight: 800;
-            color: #f1f5f9;
+            color: #f8fafc;
+            letter-spacing: 0.5px;
         }
-        .share-banner {
-            display: none;
-            background: rgba(34, 197, 94, 0.15);
-            border: 1px solid #22c55e;
-            color: #86efac;
-            padding: 4px;
-            border-radius: 6px;
-            font-size: 11px;
-            text-align: center;
-            margin-bottom: 4px;
-        }
+
+        /* 頂部操作控制盒 */
         .control-box {
-            background: #1e293b;
-            border-radius: 12px;
+            background: #18233c;
+            border-radius: 14px;
             padding: 8px 10px;
             border: 1px solid #334155;
             display: flex;
@@ -55,24 +49,25 @@
         .input-row {
             display: flex;
             align-items: center;
-            gap: 6px;
+            gap: 8px;
         }
         .input-row label {
-            font-size: 12px;
-            font-weight: 600;
-            color: #cbd5e1;
+            font-size: 14px;
+            font-weight: 700;
+            color: #e2e8f0;
             white-space: nowrap;
         }
+        
         input[type="text"] {
-            background-color: #0f172a;
-            border: 1px solid #334155;
+            background-color: #0b1329;
+            border: 1.5px solid #38bdf8;
             color: #38bdf8;
-            padding: 4px 8px;
-            border-radius: 6px;
-            font-size: 14px;
-            font-weight: bold;
+            padding: 5px 8px;
+            border-radius: 8px;
+            font-size: 18px;
+            font-weight: 800;
             font-family: ui-monospace, monospace;
-            width: 80px;
+            width: 95px;
             text-align: center;
             outline: none;
         }
@@ -83,36 +78,37 @@
         button {
             border: none;
             border-radius: 8px;
-            font-size: 12px;
-            font-weight: 600;
+            font-size: 13px;
+            font-weight: 700;
             padding: 6px 8px;
             cursor: pointer;
             white-space: nowrap;
             transition: opacity 0.15s;
         }
         button:active { opacity: 0.7; }
-        .btn-start { background: #2563eb; color: #fff; flex: 1.2; font-size: 13px; }
+        .btn-start { background: #2563eb; color: #fff; flex: 1.2; font-size: 14px; }
         .btn-now { background: #0284c7; color: #fff; flex: 1; }
-        .btn-share { background: #10b981; color: #fff; flex: 1; }
-        .btn-reset { background: #334155; color: #cbd5e1; padding: 6px 10px; }
+        .btn-share { background: #10b981; color: #fff; flex: 1.3; }
+        .btn-reset { background: #334155; color: #cbd5e1; flex: 0.6; }
 
-        /* 三卡片緊湊排版 */
+        /* 三大方案卡片列表 */
         .cards-list {
             display: flex;
             flex-direction: column;
-            gap: 6px;
+            gap: 8px;
             flex: 1;
-            justify-content: space-around;
-            margin: 4px 0;
+            justify-content: space-between;
+            margin: 4px 0 0 0;
         }
         .plan-card {
-            background: #1e293b;
-            border-radius: 12px;
+            background: #18233c;
+            border-radius: 14px;
             padding: 8px 10px;
             border: 1px solid #334155;
             display: flex;
             flex-direction: column;
             justify-content: space-between;
+            flex: 1;
         }
         .card-top {
             display: flex;
@@ -120,72 +116,77 @@
             align-items: center;
         }
         .plan-title {
-            font-size: 13px;
-            font-weight: 700;
-            color: #f1f5f9;
+            font-size: 15px;
+            font-weight: 800;
+            color: #f8fafc;
         }
         .plan-tag {
-            font-size: 11px;
+            font-size: 13px;
+            font-weight: 600;
             color: #94a3b8;
         }
         .card-mid {
             display: flex;
-            align-items: baseline;
+            align-items: flex-end;
             justify-content: space-between;
-            margin: 2px 0;
+            margin: 1px 0;
         }
+        
         .timer-val {
-            font-size: 26px;
-            font-weight: 800;
+            font-size: 32px;
+            font-weight: 900;
             font-family: ui-monospace, monospace;
             color: #38bdf8;
             line-height: 1;
+            letter-spacing: 0.5px;
         }
         .target-val {
-            font-size: 12px;
-            color: #cbd5e1;
-            font-weight: 500;
+            font-size: 13px;
+            color: #e2e8f0;
+            font-weight: 700;
         }
+        
+        /* 劑次標籤列（大字體設定） */
         .card-doses {
             display: flex;
-            gap: 4px;
-            margin-top: 4px;
+            gap: 6px;
         }
         .dose-pill {
             flex: 1;
-            background: #0f172a;
-            border: 1px solid #334155;
-            padding: 3px 4px;
-            border-radius: 6px;
-            font-size: 10px;
+            background: #0b1329;
+            border: 1.5px solid #334155;
+            padding: 6px 8px;
+            border-radius: 8px;
+            font-size: 15px;
+            font-weight: 800;
             display: flex;
             justify-content: space-between;
             align-items: center;
+            font-family: ui-monospace, monospace;
+        }
+        .dose-pill span:first-child {
+            font-size: 14px;
+            font-weight: 800;
         }
         .dose-pill.done {
             border-color: #16a34a;
-            background: rgba(22, 163, 74, 0.12);
+            background: rgba(22, 163, 74, 0.2);
             color: #86efac;
         }
         .dose-pill.current {
             border-color: #38bdf8;
-            background: rgba(56, 189, 248, 0.12);
+            background: rgba(56, 189, 248, 0.2);
             color: #38bdf8;
         }
     </style>
 </head>
 <body>
 
-    <!-- 標題 -->
     <div class="app-header">
         <h1>💊 服藥同步倒數計時</h1>
     </div>
 
-    <div id="shareBanner" class="share-banner">
-        🔗 已載入共享排程！
-    </div>
-
-    <!-- 緊湊控制面板 -->
+    <!-- 頂部控制面板 -->
     <div class="control-box">
         <div class="input-row">
             <label for="timeTextInput">第一次服藥：</label>
@@ -199,7 +200,7 @@
         </div>
     </div>
 
-    <!-- 三方案列表（高度自動自適應） -->
+    <!-- 三方案卡片 -->
     <div class="cards-list">
         
         <!-- 方案 A -->
@@ -353,7 +354,6 @@
                     targetEl.textContent = "第" + (nextDoseIdx + 1) + "劑 " + formatHM(new Date(schedule[nextDoseIdx]));
                 }
 
-                // 緊湊藥丸列表
                 var listHtml = '';
                 for (var i = 0; i < schedule.length; i++) {
                     var doseTime = schedule[i];
@@ -410,7 +410,7 @@
             }
             var shareUrl = window.location.origin + window.location.pathname + '#t=' + baseStartTime;
             navigator.clipboard.writeText(shareUrl).then(function() {
-                alert('已複製共享連結！傳給第二人打開即可同步觀看：\n' + shareUrl);
+                alert('已複製共享連結！');
             }).catch(function() {
                 prompt('請複製下方共享連結：', shareUrl);
             });
@@ -435,7 +435,6 @@
                 }
                 document.getElementById('list' + key).innerHTML = html;
             });
-            document.getElementById('shareBanner').style.display = 'none';
         };
 
         window.addEventListener('DOMContentLoaded', function() {
@@ -443,7 +442,6 @@
             if (hash && hash.indexOf('t=') !== -1) {
                 var ts = parseInt(hash.split('t=')[1]);
                 if (!isNaN(ts)) {
-                    document.getElementById('shareBanner').style.display = 'block';
                     startTimerFromTimestamp(ts);
                     return;
                 }
