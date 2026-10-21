@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>鐵公雞 鐵板雞排王 | 寧夏夜市 092攤位</title>
+    <style>
+        /* 基礎設定與變數 */
+        :root {
+            --primary-red: #B3171F; /* 經典紅 */
+            --dark-red: #8B0000;
+            --accent-yellow: #F6AB27; /* 經典黃 */
+            --text-white: #FFFFFF;
+            --text-black: #222222;
+            --bg-light: #F7F5F0;
+            --line-green: #06C755;
+            --shadow: 0 10px 25px rgba(0,0,0,0.12);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: "Microsoft JhengHei", "PingFang TC", "Helvetica Neue", sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-light);
+            color: var(--text-black);
+            line-height: 1.6;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        /* 頂部 Header 區塊 */
+        header {
+            background: linear-gradient(135deg, var(--primary-red), var(--dark-red));
+            color: var(--text-white);
+            text-align: center;
+            padding: 35px 20px 50px;
+            border-bottom-left-radius: 35px;
+            border-bottom-right-radius: 35px;
+            box-shadow: 0 6px 15px rgba(0,0,0,0.2);
+            position: relative;
+            z-index: 1;
+        }
+
+        /* IG Logo 連結設計 */
+        .logo-link {
+            display: inline-block;
+            text-decoration: none;
+            transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            margin-bottom: 15px;
+        }
+
+        .logo-link:hover {
+            transform: scale(1.03);
+        }
+
+        .logo-img {
+            width: 150px;
+            height: 150px;
+            object-fit: cover;
+            border-radius: 20px;
+            border: 3px solid var(--accent-yellow);
+            box-shadow: 0 6px 16px rgba(0,0,0,0.35);
+            display: block;
+            background-color: #fff;
+            margin: 0 auto 8px auto;
+        }
+
+        /* Logo 下方的引導點擊提示 */
+        .ig-hint {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            background: rgba(0, 0, 0, 0.25);
+            color: var(--accent-yellow);
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: bold;
+            letter-spacing: 0.5px;
+            border: 1px solid rgba(246, 171, 39, 0.3);
+            transition: background 0.2s;
+        }
+
+        .logo-link:hover .ig-hint {
+            background: rgba(0, 0, 0, 0.4);
+        }
+
+        header h1 {
+            font-size: 1.35rem;
+            letter-spacing: 1px;
+            text-shadow: 1px 1px 3px rgba(0,0,0,0.4);
+            margin-top: 10px;
+            margin-bottom: 6px;
+            font-weight: bold;
+        }
+
+        header p.subtitle {
+            font-size: 1.05rem;
+            color: var(--accent-yellow);
+            font-weight: bold;
+            margin-bottom: 4px;
+        }
+
+        header p.schedule {
+            font-size: 0.95rem;
+            color: #FFD1D1;
+            letter-spacing: 0.5px;
+        }
+
+        /* 內容容器，往上浮動壓在 Header 上 */
+        .container {
+            max-width: 500px;
+            margin: -25px auto 0;
+            padding: 0 16px;
+            position: relative;
+            z-index: 2;
+            padding-bottom: 110px;
+        }
+
+        /* 卡片式設計 */
+        .card {
+            background: var(--text-white);
+            border-radius: 20px;
+            padding: 24px 20px;
+            box-shadow: var(--shadow);
+            margin-bottom: 20px;
+            text-align: center;
+            border: 1px solid rgba(0,0,0,0.04);
+        }
+
+        .section-title {
+            color: var(--primary-red);
+            font-size: 1.5rem;
+            font-weight: 900;
+            margin-bottom: 16px;
+            position: relative;
+            display: inline-block;
+        }
+
+        .section-title::after {
+            content: '';
+            position: absolute;
+            bottom: -6px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 40px;
+            height: 3px;
+            background-color: var(--accent-yellow);
+            border-radius: 2px;
+        }
+
+        /* 圖片展示區 */
+        .menu-image-container {
+            width: 100%;
+            overflow: hidden;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+            margin-bottom: 16px;
+            background: #fff;
+        }
+
+        .menu-img {
+            width: 100%;
+            height: auto;
+            display: block;
+            transition: transform 0.3s ease;
+        }
+
+        .menu-img:hover {
+            transform: scale(1.02);
+        }
+
+        /* 選項標籤 */
+        .flavor-tags {
+            display: flex;
+            justify-content: center;
+            gap: 8px;
+            flex-wrap: wrap;
+            margin-top: 12px;
+        }
+
+        .tag {
+            padding: 6px 14px;
+            border-radius: 20px;
+            color: white;
+            font-weight: bold;
+            font-size: 0.9rem;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .tag-origin { background-color: #00A0E9; }
+        .tag-pepper { background-color: #009944; }
+        .tag-chili { background-color: #222222; }
+        .tag-cheese { background-color: #F39800; color: #111; }
+
+        /* 按鈕共用樣式 */
+        .btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            padding: 15px;
+            border-radius: 50px;
+            text-decoration: none;
+            font-size: 1.1rem;
+            font-weight: bold;
+            transition: all 0.2s ease;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+            cursor: pointer;
+            border: none;
+        }
+
+        .btn:active {
+            transform: scale(0.98);
+        }
+
+        /* Google Map 按鈕 */
+        .btn-map {
+            background-color: var(--text-white);
+            color: var(--primary-red);
+            border: 2px solid var(--primary-red);
+            margin-top: 8px;
+        }
+
+        .btn-map:hover {
+            background-color: #FFF5F5;
+        }
+
+        /* 底部固定 LINE 按鈕 */
+        .fixed-bottom {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            padding: 14px 16px;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            box-shadow: 0 -4px 20px rgba(0,0,0,0.1);
+            z-index: 100;
+            display: flex;
+            justify-content: center;
+        }
+
+        .fixed-bottom-inner {
+            width: 100%;
+            max-width: 500px;
+        }
+
+        .btn-line {
+            background-color: var(--line-green);
+            color: var(--text-white);
+        }
+        
+        .btn-line:hover {
+            background-color: #05b34c;
+        }
+
+    </style>
+</head>
+<body>
+
+    <!-- 頂部 Header -->
+    <header>
+        <!-- 點擊 Logo 區塊整體導向 IG -->
+        <a href="https://www.instagram.com/ironroosterteppanyaki/" target="_blank" class="logo-link" title="前往 Instagram 觀看更多">
+            <img src="https://gottrip.github.io/lulu-travel/kklogo.jpeg" alt="鐵公雞 鐵板雞排王 Logo" class="logo-img">
+            <div class="ig-hint">
+                📸 點擊前往 IG 查看動態
+            </div>
+        </a>
+
+        <h1>🌙 寧夏夜市 092攤位</h1>
+        <p class="subtitle">🐓 鐵板嫩煎雞排 ”雞胸肉” 專門</p>
+        <p class="schedule">🕕 週休二、三</p>
+    </header>
+
+    <!-- 主要內容區 -->
+    <div class="container">
+        
+        <!-- 菜單展示卡片 -->
+        <div class="card">
+            <h2 class="section-title">招牌菜單</h2>
+            
+            <div class="menu-image-container">
+                <img src="https://gottrip.github.io/lulu-travel/kkdm.jpeg" alt="鐵板嫩煎雞排菜單" class="menu-img">
+            </div>
+
+            <div class="flavor-tags">
+                <span class="tag tag-origin">原煎</span>
+                <span class="tag tag-pepper">黑胡椒</span>
+                <span class="tag tag-chili">辣味</span>
+                <span class="tag tag-cheese">起司 +20</span>
+            </div>
+
+            <div style="margin-top: 18px; font-size: 1.35rem; font-weight: 900; color: var(--primary-red);">
+                <span style="margin-right: 20px;">小份 $100</span>
+                <span>大份 $180</span>
+            </div>
+        </div>
+
+        <!-- 門市資訊卡片 -->
+        <div class="card">
+            <h2 class="section-title">來找我們吃雞排</h2>
+            <p style="margin-bottom: 15px; color: #555; font-size: 0.95rem;">點擊下方按鈕開啟地圖，馬上導航到攤位！</p>
+            
+            <!-- Google Map 導航按鈕 -->
+            <a href="https://maps.app.goo.gl/fsRApXr4Sx1eumP1A" target="_blank" class="btn btn-map">
+                📍 開啟 Google 地圖導航
+            </a>
+        </div>
+
+    </div>
+
+    <!-- 底部懸浮 LINE 按鈕 -->
+    <div class="fixed-bottom">
+        <div class="fixed-bottom-inner">
+            <a href="#" class="btn btn-line" id="lineBtn">
+                💬 點此加入 LINE 線上預訂
+            </a>
+        </div>
+    </div>
+
+    <script>
+        // LINE 按鈕提示腳本
+        document.getElementById('lineBtn').addEventListener('click', function(e) {
+            const href = this.getAttribute('href');
+            if(href === '#') {
+                e.preventDefault();
+                alert('【鐵公雞 鐵板雞排王】\nLINE 官方帳號正在準備中！\n目前請先點擊上方地圖導航至寧夏夜市攤位購買，謝謝您的支持！');
+            }
+        });
+    </script>
+
+</body>
+</html>
